@@ -1,6 +1,6 @@
 plugins {
 	id("kotlin2js")
-	id("ru.capjack.degos-publish")
+	id("ru.capjack.degos.publish")
 }
 
 dependencies {

@@ -1,4 +1,4 @@
-rootProject.name = "StripSlotsStandalone-common"
+rootProject.name = "csi"
 
 include(
 	"csi-messenger:csi-messenger-common",

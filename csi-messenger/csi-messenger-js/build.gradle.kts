@@ -2,7 +2,7 @@ import org.jetbrains.kotlin.gradle.tasks.Kotlin2JsCompile
 
 plugins {
 	id("kotlin-platform-js")
-	id("ru.capjack.degos-publish")
+	id("ru.capjack.degos.publish")
 }
 
 dependencies {
