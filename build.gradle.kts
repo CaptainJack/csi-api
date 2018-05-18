@@ -2,7 +2,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
 	id("kotlin") version "1.2.41" apply false
-	id("ru.capjack.degos.publish") version "1.5.0" apply false
+	id("ru.capjack.degos.publish") version "1.6.0" apply false
 	id("nebula.release") version "6.0.0"
 }
 
