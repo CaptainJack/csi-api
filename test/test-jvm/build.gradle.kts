@@ -5,4 +5,5 @@ plugins {
 
 dependencies {
 	implementation(kotlin("stdlib-jdk8"))
+	implementation(project(":csi-core:csi-core-jvm"))
 }

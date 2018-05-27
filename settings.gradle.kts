@@ -1,12 +1,14 @@
 rootProject.name = "csi"
 
 include(
-	"csi-messenger:csi-messenger-common",
-	"csi-messenger:csi-messenger-js",
-	"csi-messenger:csi-messenger-jvm",
+	"csi-core:csi-core-common",
+	"csi-core:csi-core-js",
+	"csi-core:csi-core-jvm",
 	
 	"csi-client:csi-client-js",
-	"csi-server:csi-server-jvm"
+	"csi-server:csi-server-jvm",
+	
+	"test:test-jvm"
 )
 
 

@@ -1,3 +1,6 @@
+import org.jetbrains.kotlin.gradle.plugin.Kotlin2JsPluginWrapper
+import org.jetbrains.kotlin.gradle.plugin.KotlinPluginWrapper
+import org.jetbrains.kotlin.gradle.tasks.Kotlin2JsCompile
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -11,12 +14,22 @@ subprojects {
 	
 	repositories.maven("http://artifactory.capjack.ru/public")
 	
-	plugins.withId("java") {
+	plugins.withType<KotlinPluginWrapper> {
 		configure<JavaPluginConvention> {
 			sourceCompatibility = JavaVersion.VERSION_1_8
 		}
 		tasks.withType<KotlinCompile> {
 			kotlinOptions.jvmTarget = JavaVersion.VERSION_1_8.toString()
+		}
+	}
+
+	plugins.withType<Kotlin2JsPluginWrapper> {
+		tasks.withType<Kotlin2JsCompile> {
+			kotlinOptions {
+				moduleKind = "amd"
+				sourceMap = true
+				sourceMapEmbedSources = "always"
+			}
 		}
 	}
 }
