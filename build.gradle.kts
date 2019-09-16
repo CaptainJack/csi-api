@@ -1,35 +1,27 @@
-import org.jetbrains.kotlin.gradle.plugin.Kotlin2JsPluginWrapper
-import org.jetbrains.kotlin.gradle.plugin.KotlinPluginWrapper
-import org.jetbrains.kotlin.gradle.tasks.Kotlin2JsCompile
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompile
 
 plugins {
-	id("kotlin") version "1.2.41" apply false
-	id("ru.capjack.degos.publish") version "1.6.0" apply false
-	id("nebula.release") version "6.0.0"
+	kotlin("multiplatform") version "1.3.50" apply false
+	id("ru.capjack.depver") version "0.2.2"
+	id("ru.capjack.logging") version "0.14.7"
+	id("ru.capjack.bintray") version "0.20.1"
+	id("nebula.release") version "12.0.0"
+}
+
+depver {
+	"ru.capjack.csi:csi-transport-*"("0.1.0-dev.3+6e89523")
 }
 
 subprojects {
 	group = "ru.capjack.csi"
 	
-	repositories.maven("http://artifactory.capjack.ru/public")
-	
-	plugins.withType<KotlinPluginWrapper> {
-		configure<JavaPluginConvention> {
-			sourceCompatibility = JavaVersion.VERSION_1_8
-		}
-		tasks.withType<KotlinCompile> {
-			kotlinOptions.jvmTarget = JavaVersion.VERSION_1_8.toString()
-		}
+	repositories {
+		jcenter()
+		maven("https://dl.bintray.com/capjack/public")
+		mavenLocal()
 	}
-
-	plugins.withType<Kotlin2JsPluginWrapper> {
-		tasks.withType<Kotlin2JsCompile> {
-			kotlinOptions {
-				moduleKind = "amd"
-				sourceMap = true
-				sourceMapEmbedSources = "always"
-			}
-		}
+	
+	tasks.withType<KotlinJvmCompile> {
+		kotlinOptions.jvmTarget = "1.8"
 	}
 }
