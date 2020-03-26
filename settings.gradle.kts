@@ -1,11 +1,22 @@
 rootProject.name = "csi-api"
 
 include(
-	":common",
-	":client",
-	":server"
+	"runtime:common",
+	"runtime:client",
+	"runtime:server",
+	
+	"generator",
+	"gradle-plugin",
+	
+	"sandbox:api",
+	"sandbox:api:client",
+	"sandbox:api:server",
+	"sandbox:api-generator"
 )
 
-arrayOf("common", "client", "server").forEach { project(":$it").name = "${rootProject.name}-$it" }
+arrayOf("common", "client", "server").forEach {
+	project(":runtime:$it").name = "${rootProject.name}-$it"
+}
 
-enableFeaturePreview("GRADLE_METADATA")
+project(":generator").name = "${rootProject.name}-generator"
+project(":gradle-plugin").name = "${rootProject.name}-gradle"
