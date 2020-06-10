@@ -11,7 +11,17 @@ open class GenerateCsiApiTask : AbstractTask() {
 		val extension = project.extensions.getByType<CsiApiExtension>()
 		val generator = CsiApiGenerator(extension.sourcePackage)
 		
+		if (extension.modelSnapshotFile.exists()) {
+			generator.model.load(
+				extension.modelSnapshotFile.readText()
+			)
+		}
+		
 		generator.loadKotlin(project.file("src").toPath())
+		
+		extension.modelSnapshotFile.writeText(
+			generator.model.save()
+		)
 		
 		extension.targets.filter { it.platform.isKotlin() }.map { it.side }.distinct().forEach { it ->
 			when (it) {

@@ -13,6 +13,7 @@ open class CsiApiPlugin : Plugin<Project> {
 			sourceSets.getByName("commonMain") {
 				dependencies {
 					implementation(kotlin("stdlib-common"))
+					implementation("ru.capjack.csi:csi-api-common")
 				}
 				kotlin.setSrcDirs(listOf("src"))
 			}

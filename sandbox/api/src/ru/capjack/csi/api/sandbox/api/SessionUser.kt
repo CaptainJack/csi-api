@@ -3,5 +3,5 @@ package ru.capjack.csi.api.sandbox.api
 class SessionUser(
 	id: Long,
 	name: String,
-	val coins: Long
+	var coins: Long
 ) : User(id, name)

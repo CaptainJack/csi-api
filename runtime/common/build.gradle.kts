@@ -13,6 +13,7 @@ kotlin {
 			implementation(kotlin("stdlib-common"))
 			api("ru.capjack.csi:csi-core-common")
 			api("ru.capjack.tool:tool-io-biser")
+			api("ru.capjack.tool:tool-logging")
 		}
 		
 		get("jvmMain").dependencies {

@@ -4,9 +4,9 @@ import ru.capjack.tool.io.biser.BiserReader
 
 actual class RealCallbacksRegister : CallbacksRegister {
 	private var nextId = 0
-	private val map = HashMap<Int, BiserReader.() -> Unit>()
+	private val map = HashMap<Int, BiserReader.(Int) -> Unit>()
 	
-	override fun put(callback: BiserReader.() -> Unit): Int {
+	override fun put(callback: BiserReader.(Int) -> Unit): Int {
 		val id = nextId++
 		if (map.contains(id)) {
 			throw IllegalStateException("Unprocessed callback $id")
@@ -17,7 +17,7 @@ actual class RealCallbacksRegister : CallbacksRegister {
 		return id
 	}
 	
-	override fun take(id: Int): (BiserReader.() -> Unit)? {
+	override fun take(id: Int): (BiserReader.(Int) -> Unit)? {
 		return map.remove(id)
 	}
 }

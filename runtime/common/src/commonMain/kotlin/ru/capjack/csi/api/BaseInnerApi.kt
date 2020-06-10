@@ -1,5 +1,5 @@
 package ru.capjack.csi.api
 
-interface BaseInternalApi {
+interface BaseInnerApi {
 	fun handleConnectionClose()
 }

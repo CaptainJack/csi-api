@@ -4,6 +4,7 @@ import ru.capjack.tool.io.biser.generator.CodePath
 import ru.capjack.tool.io.biser.generator.model.Model
 import ru.capjack.tool.utils.collections.getOrAdd
 import ru.capjack.tool.utils.collections.mutableKeyedSetOf
+import kotlin.math.max
 
 class ApiModel : Model() {
 	private val _client = ApiImpl(CodePath("client.ClientApi"))
@@ -30,11 +31,14 @@ class ApiModel : Model() {
 		loadApi(_server, data["server"] as Map<String, Map<String, Any>>)
 		
 		data["services"].asObjectList().mapTo(services) { s ->
-			provideServicesDescriptorImpl(s["name"] as String).also { d ->
+			provideServicesDescriptorImpl(s["path"] as String).also { d ->
 				d.lastMethodId = s["lastMethodId"] as Int
+				var maxMethodId = 0
 				s["methods"].asObjectList().mapTo(d.methods) { m ->
+					val id = m["id"] as Int
+					maxMethodId = max(id, maxMethodId)
 					MethodImpl(
-						m["id"] as Int,
+						id,
 						m["name"] as String,
 						m["arguments"].asObjectList().map {
 							Parameter(it["name"] as String, loadType(it["type"] as String))
@@ -44,6 +48,7 @@ class ApiModel : Model() {
 						}
 					)
 				}
+				d.lastMethodId = max(maxMethodId, d.lastMethodId)
 			}
 		}
 	}
@@ -55,7 +60,7 @@ class ApiModel : Model() {
 		data["server"] = saveApi(_server)
 		data["services"] = services.map { s ->
 			mapOf(
-				"path" to s.path,
+				"path" to s.path.value,
 				"lastMethodId" to s.lastMethodId,
 				"methods" to s.methods.map { m ->
 					mapOf(
@@ -83,24 +88,30 @@ class ApiModel : Model() {
 		api.path = CodePath(data["path"] as String)
 		api.lastServiceId = data["lastServiceId"] as Int
 		
+		var maxServiceId = 0
+		
 		data["services"].asObjectList().mapTo(api.services) {
+			val id = it["id"] as Int
+			maxServiceId = max(id, maxServiceId)
 			ServiceImpl(
-				it["id"] as Int,
+				id,
 				it["name"] as String,
 				provideServicesDescriptorImpl(it["type"] as String)
 			)
 		}
+		
+		api.lastServiceId = max(maxServiceId, api.lastServiceId)
 	}
 	
 	private fun saveApi(api: ApiImpl): Map<String, Any> {
 		return mapOf(
-			"name" to api.path,
+			"path" to api.path.value,
 			"lastServiceId" to api.lastServiceId,
 			"services" to api.services.map {
 				mapOf(
 					"id" to it.id,
 					"name" to it.name,
-					"type" to it.descriptor.path
+					"type" to it.descriptor.path.value
 				)
 			}
 		)

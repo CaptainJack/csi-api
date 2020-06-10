@@ -6,16 +6,18 @@ import java.util.concurrent.atomic.AtomicInteger
 
 actual class RealCallbacksRegister : CallbacksRegister {
 	private val nextId = AtomicInteger()
-	private val map = ConcurrentHashMap<Int, BiserReader.() -> Unit>()
+	private val map = ConcurrentHashMap<Int, BiserReader.(Int) -> Unit>()
 	
-	override fun put(callback: BiserReader.() -> Unit): Int {
+	override fun put(callback: BiserReader.(Int) -> Unit): Int {
 		val id = nextId.getAndIncrement()
 		if (null == map.putIfAbsent(id, callback)) return id
 		
 		throw IllegalStateException("Unprocessed callback $id")
 	}
 	
-	override fun take(id: Int): (BiserReader.() -> Unit)? {
+	override fun take(id: Int): (BiserReader.(Int) -> Unit)? {
 		return map.remove(id)
 	}
+	
+	
 }

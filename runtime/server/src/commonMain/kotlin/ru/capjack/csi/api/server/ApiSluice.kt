@@ -1,5 +1,7 @@
 package ru.capjack.csi.api.server
 
-interface ApiSluice<I : Any, IA : InternalApi, OA : Any> {
-	fun connect(identity: I, outerApi: OA): IA
+import ru.capjack.csi.api.OuterApi
+
+interface ApiSluice<I : Any, IA : InnerApi, OA : OuterApi> {
+	fun connect(identity: I, client: OA): IA
 }

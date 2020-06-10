@@ -13,17 +13,17 @@ internal fun Project.getTargetProject(target: ApiTarget): Project {
 }
 
 internal fun Project.configureKmp(configuration: KotlinMultiplatformExtension.() -> Unit) {
-	configure(configuration)
+//	configure(configuration)
 }
 
 
 internal fun KotlinMultiplatformExtension.emptySourceSets(name: String) {
-	sourceSets.getByName(name + "Main") {
+	/*sourceSets.getByName(name + "Main") {
 		kotlin.setSrcDirs(emptyList<String>())
 		resources.setSrcDirs(emptyList<String>())
 	}
 	sourceSets.getByName(name + "Test") {
 		kotlin.setSrcDirs(emptyList<String>())
 		resources.setSrcDirs(emptyList<String>())
-	}
+	}*/
 }

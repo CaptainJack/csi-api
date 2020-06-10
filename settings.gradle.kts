@@ -11,7 +11,9 @@ include(
 	"sandbox:api",
 	"sandbox:api:client",
 	"sandbox:api:server",
-	"sandbox:api-generator"
+	"sandbox:api-generator",
+	"sandbox:server-jvm",
+	"sandbox:client-jvm"
 )
 
 arrayOf("common", "client", "server").forEach {

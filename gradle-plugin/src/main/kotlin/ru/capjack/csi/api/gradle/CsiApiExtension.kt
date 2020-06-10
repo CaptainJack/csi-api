@@ -7,6 +7,8 @@ open class CsiApiExtension(private val project: Project) {
 	
 	private val _targets = mutableListOf<ApiTarget>()
 	
+	var modelSnapshotFile = project.file("model.yml")
+	
 	var sourcePackage = defineSourcePackage(project.file("src"), "")
 	
 	val targets: List<ApiTarget>

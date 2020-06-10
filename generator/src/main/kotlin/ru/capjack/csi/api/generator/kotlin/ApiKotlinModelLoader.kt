@@ -79,7 +79,10 @@ class ApiKotlinModelLoader(
 		var result: List<Parameter>? = null
 		
 		descriptor.valueParameters.forEach { parameter ->
-			if (parameter.type.isFunctionType) {
+			if (parameter.type.toString().startsWith("[ERROR : Callback<")) {
+				result = listOf(Parameter(null, defineType(parameter.type.arguments[0].type)))
+			}
+			else if (parameter.type.isFunctionType) {
 				result = parameter.type.getValueParameterTypesFromFunctionType().map {
 					Parameter(it.type.extractParameterNameFromFunctionTypeArgument()?.toString(), defineType(it.type))
 				}

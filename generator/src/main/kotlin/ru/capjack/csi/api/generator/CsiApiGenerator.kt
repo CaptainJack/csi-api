@@ -10,7 +10,7 @@ import ru.capjack.tool.io.biser.generator.kotlin.KotlinSource
 import java.nio.file.Path
 
 class CsiApiGenerator(sourcePackage: String) {
-	private val model = ApiModel()
+	val model = ApiModel()
 	private val sourcePackage = CodePath(sourcePackage)
 	
 	fun loadKotlin(sourcePath: Path) {

@@ -15,6 +15,7 @@ kotlin {
 	sourceSets.getByName("commonMain") {
 		dependencies {
 			implementation(kotlin("stdlib-common"))
+			implementation(project(":runtime:csi-api-common"))
 		}
 		kotlin.setSrcDirs(listOf("src"))
 	}

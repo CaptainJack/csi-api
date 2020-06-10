@@ -1,5 +1,5 @@
 package ru.capjack.csi.api.sandbox.api.server
 
-import ru.capjack.csi.api.server.InternalApi
+import ru.capjack.csi.api.server.InnerApi
 
-interface InternalServerApi : ServerApi, InternalApi
+interface InternalServerApi : ServerApi, InnerApi
