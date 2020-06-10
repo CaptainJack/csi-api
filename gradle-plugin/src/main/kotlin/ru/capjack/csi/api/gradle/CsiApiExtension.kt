@@ -66,7 +66,9 @@ open class CsiApiExtension(private val project: Project) {
 	
 	private fun Project.configureKotlinJvm() {
 		configureKmp {
-			jvm()
+			jvm {
+				compilations.all { kotlinOptions.jvmTarget = "1.8" }
+			}
 			emptySourceSets("jvm")
 			sourceSets.getByName("jvmMain") {
 				dependencies {
@@ -74,6 +76,8 @@ open class CsiApiExtension(private val project: Project) {
 				}
 			}
 		}
+		
+		
 	}
 	
 	private fun Project.configureKotlinJs() {

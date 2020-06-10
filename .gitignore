@@ -1,6 +1,6 @@
-/.gradle/
 /tmp/
 /.idea/
 
+.gradle/
 build/
 out/
