@@ -15,15 +15,7 @@ import ru.capjack.tool.io.biser.generator.TypeCollector
 import ru.capjack.tool.io.biser.generator.kotlin.KotlinCoderNameVisitor
 import ru.capjack.tool.io.biser.generator.kotlin.KotlinCodersGenerator
 import ru.capjack.tool.io.biser.generator.kotlin.KotlinFile
-import ru.capjack.tool.io.biser.generator.model.EntityDescriptor
-import ru.capjack.tool.io.biser.generator.model.EnumDescriptor
-import ru.capjack.tool.io.biser.generator.model.ListType
-import ru.capjack.tool.io.biser.generator.model.NullableType
-import ru.capjack.tool.io.biser.generator.model.PrimitiveType
-import ru.capjack.tool.io.biser.generator.model.StructureDescriptorVisitor
-import ru.capjack.tool.io.biser.generator.model.StructureType
-import ru.capjack.tool.io.biser.generator.model.Type
-import ru.capjack.tool.io.biser.generator.model.TypeVisitor
+import ru.capjack.tool.io.biser.generator.model.*
 import java.nio.file.Path
 
 abstract class AbstractKotlinApiGenerator(
@@ -141,6 +133,10 @@ abstract class AbstractKotlinApiGenerator(
 				}
 				line("append('}')")
 			}
+		}
+		
+		override fun visitObjectStructureDescriptor(descriptor: ObjectDescriptor, data: GenerateLoggingVisitorData) {
+			data.code.line("log(\"${descriptor.type.path.name}\")")
 		}
 	}
 	
