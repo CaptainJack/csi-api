@@ -2,18 +2,6 @@
 
 package ru.capjack.csi.api
 
-fun StringBuilder.log(arg: String, value: Boolean) = logPrefix(arg).append(value)
-fun StringBuilder.log(arg: String, value: Byte) = logPrefix(arg).append(value)
-fun StringBuilder.log(arg: String, value: Int) = logPrefix(arg).append(value)
-fun StringBuilder.log(arg: String, value: Double) = logPrefix(arg).append(value)
-fun StringBuilder.log(arg: String, value: Long) = logPrefix(arg).append(value)
-fun StringBuilder.log(arg: String, value: String) = logPrefix(arg).append(value)
-fun StringBuilder.log(arg: String, value: BooleanArray) = logPrefix(arg).apply { value.joinTo(this, SEP, "[", "]") }
-fun StringBuilder.log(arg: String, value: ByteArray) = logPrefix(arg).apply { value.joinTo(this, SEP, "[", "]") }
-fun StringBuilder.log(arg: String, value: IntArray) = logPrefix(arg).apply { value.joinTo(this, SEP, "[", "]") }
-fun StringBuilder.log(arg: String, value: DoubleArray) = logPrefix(arg).apply { value.joinTo(this, SEP, "[", "]") }
-fun StringBuilder.log(arg: String, value: LongArray) = logPrefix(arg).apply { value.joinTo(this, SEP, "[", "]") }
-
 fun StringBuilder.log(value: Boolean) = append(value)
 fun StringBuilder.log(value: Byte) = append(value)
 fun StringBuilder.log(value: Int) = append(value)
@@ -26,17 +14,29 @@ fun StringBuilder.log(value: IntArray) = value.joinTo(this, SEP, "[", "]")
 fun StringBuilder.log(value: DoubleArray) = value.joinTo(this, SEP, "[", "]")
 fun StringBuilder.log(value: LongArray) = value.joinTo(this, SEP, "[", "]")
 
-fun StringBuilder.logS(arg: String, value: Boolean) = log(value).append(SEP)
-fun StringBuilder.logS(arg: String, value: Byte) = log(value).append(SEP)
-fun StringBuilder.logS(arg: String, value: Int) = log(value).append(SEP)
-fun StringBuilder.logS(arg: String, value: Double) = log(value).append(SEP)
-fun StringBuilder.logS(arg: String, value: Long) = log(value).append(SEP)
-fun StringBuilder.logS(arg: String, value: String) = log(value).append(SEP)
-fun StringBuilder.logS(arg: String, value: BooleanArray) = log(value).append(SEP)
-fun StringBuilder.logS(arg: String, value: ByteArray) = log(value).append(SEP)
-fun StringBuilder.logS(arg: String, value: IntArray) = log(value).append(SEP)
-fun StringBuilder.logS(arg: String, value: DoubleArray) = log(value).append(SEP)
-fun StringBuilder.logS(arg: String, value: LongArray) = log(value).append(SEP)
+fun StringBuilder.log(arg: String, value: Boolean) = logPrefix(arg).log(value)
+fun StringBuilder.log(arg: String, value: Byte) = logPrefix(arg).log(value)
+fun StringBuilder.log(arg: String, value: Int) = logPrefix(arg).log(value)
+fun StringBuilder.log(arg: String, value: Double) = logPrefix(arg).log(value)
+fun StringBuilder.log(arg: String, value: Long) = logPrefix(arg).log(value)
+fun StringBuilder.log(arg: String, value: String) = logPrefix(arg).log(value)
+fun StringBuilder.log(arg: String, value: BooleanArray) = logPrefix(arg).log(value)
+fun StringBuilder.log(arg: String, value: ByteArray) = logPrefix(arg).log(value)
+fun StringBuilder.log(arg: String, value: IntArray) = logPrefix(arg).log(value)
+fun StringBuilder.log(arg: String, value: DoubleArray) = logPrefix(arg).log(value)
+fun StringBuilder.log(arg: String, value: LongArray) = logPrefix(arg).log(value)
+
+fun StringBuilder.logS(arg: String, value: Boolean) = logPrefix(arg).log(value).append(SEP)
+fun StringBuilder.logS(arg: String, value: Byte) = logPrefix(arg).log(value).append(SEP)
+fun StringBuilder.logS(arg: String, value: Int) = logPrefix(arg).log(value).append(SEP)
+fun StringBuilder.logS(arg: String, value: Double) = logPrefix(arg).log(value).append(SEP)
+fun StringBuilder.logS(arg: String, value: Long) = logPrefix(arg).log(value).append(SEP)
+fun StringBuilder.logS(arg: String, value: String) = logPrefix(arg).log(value).append(SEP)
+fun StringBuilder.logS(arg: String, value: BooleanArray) = logPrefix(arg).log(value).append(SEP)
+fun StringBuilder.logS(arg: String, value: ByteArray) = logPrefix(arg).log(value).append(SEP)
+fun StringBuilder.logS(arg: String, value: IntArray) = logPrefix(arg).log(value).append(SEP)
+fun StringBuilder.logS(arg: String, value: DoubleArray) = logPrefix(arg).log(value).append(SEP)
+fun StringBuilder.logS(arg: String, value: LongArray) = logPrefix(arg).log(value).append(SEP)
 
 fun StringBuilder.logS(value: Boolean) = append(value).append(SEP)
 fun StringBuilder.logS(value: Byte) = append(value).append(SEP)
