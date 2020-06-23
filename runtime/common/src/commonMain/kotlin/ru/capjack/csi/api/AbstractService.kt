@@ -92,16 +92,14 @@ abstract class AbstractService(
 	}
 	
 	protected fun prepareLogSend(method: String): StringBuilder {
-		return StringBuilder("<- ").append(serviceName).append('.').append(method)
+		return StringBuilder()
+			.append('[').append(connection.loggingName).append("] <- ")
+			.append(serviceName).append('.').append(method)
 	}
 	
 	protected fun prepareLogCallback(method: String, callback: Int): StringBuilder {
-		return StringBuilder("~> ")
-			.append(serviceName)
-			.append('.')
-			.append(method)
-			.append('[')
-			.append(callback)
-			.append(']')
+		return StringBuilder()
+			.append('[').append(connection.loggingName).append("] ~> ")
+			.append(serviceName).append('.').append(method).append('[').append(callback).append(']')
 	}
 }

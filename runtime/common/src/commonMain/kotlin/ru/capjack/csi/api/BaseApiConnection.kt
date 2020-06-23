@@ -7,6 +7,7 @@ import ru.capjack.tool.io.InputByteBuffer
 import ru.capjack.tool.io.biser.BiserReader
 import ru.capjack.tool.io.biser.BiserWriter
 import ru.capjack.tool.logging.Logger
+import ru.capjack.tool.logging.debug
 import ru.capjack.tool.utils.concurrency.use
 
 abstract class BaseApiConnection<IA : BaseInnerApi>(
@@ -19,6 +20,10 @@ abstract class BaseApiConnection<IA : BaseInnerApi>(
 	
 	protected val writers
 		get() = messagePool.writers
+	
+	init {
+		logger.debug { "[${connection.loggingName}] Open" }
+	}
 	
 	override fun handleConnectionMessage(message: InputByteBuffer) {
 		messagePool.readers.use { reader ->
@@ -41,6 +46,7 @@ abstract class BaseApiConnection<IA : BaseInnerApi>(
 	}
 	
 	override fun handleConnectionClose() {
+		logger.debug { "[${connection.loggingName}] Close" }
 		api.handleConnectionClose()
 	}
 	
@@ -105,11 +111,14 @@ abstract class BaseApiConnection<IA : BaseInnerApi>(
 	}
 	
 	protected fun prepareLogReceive(service: String, method: String): StringBuilder {
-		return StringBuilder("-> ").append(service).append('.').append(method)
+		return StringBuilder()
+			.append('[').append(connection.loggingName).append("] -> ")
+			.append(service).append('.').append(method)
 	}
 	
 	protected fun prepareLogCallback(service: String, method: String, callback: Int): StringBuilder {
-		return StringBuilder("<~ ")
+		return StringBuilder()
+			.append('[').append(connection.loggingName).append("] <~ ")
 			.append(service)
 			.append('.')
 			.append(method)

@@ -55,7 +55,10 @@ fun <T> StringBuilder.logS(arg: String, value: List<T>, log: StringBuilder.(T) -
 
 fun <T> StringBuilder.log(value: List<T>, log: StringBuilder.(T) -> Unit): StringBuilder {
 	append('[')
-	value.forEach { log(it) }
+	value.forEachIndexed { i, e ->
+		if (i != 0) append(SEP)
+		log(e)
+	}
 	append(']')
 	return this
 }

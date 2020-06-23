@@ -14,10 +14,11 @@ plugins {
 depver {
 	"ru.capjack.tool" {
 		"tool-utils"("0.10.1")
+		"tool-lang"("1.2.0")
 		"tool-io-biser*"("0.4.0")
 	}
 	"ru.capjack.csi" {
-		"csi-core-*"("0.3.0")
+		"csi-core-*"("0.4.0")
 		"csi-transport-*"("0.2.0")
 	}
 }
