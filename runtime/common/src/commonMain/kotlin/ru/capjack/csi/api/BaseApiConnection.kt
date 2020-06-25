@@ -8,6 +8,7 @@ import ru.capjack.tool.io.biser.BiserReader
 import ru.capjack.tool.io.biser.BiserWriter
 import ru.capjack.tool.logging.Logger
 import ru.capjack.tool.logging.debug
+import ru.capjack.tool.logging.error
 import ru.capjack.tool.utils.concurrency.use
 
 abstract class BaseApiConnection<IA : BaseInnerApi>(
@@ -47,7 +48,12 @@ abstract class BaseApiConnection<IA : BaseInnerApi>(
 	
 	override fun handleConnectionClose() {
 		logger.debug { "[${connection.loggingName}] Close" }
-		api.handleConnectionClose()
+		try {
+			api.handleConnectionClose()
+		}
+		catch (e: Throwable) {
+			logger.error(e) { "[${connection.loggingName}] Error on close" }
+		}
 	}
 	
 	protected abstract fun call(serviceId: Int, methodId: Int, message: BiserReader): Boolean
