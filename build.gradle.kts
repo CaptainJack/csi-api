@@ -15,7 +15,7 @@ depver {
 	"ru.capjack.tool" {
 		"tool-utils"("0.10.1")
 		"tool-lang"("1.2.0")
-		"tool-io-biser*"("0.4.1")
+		"tool-io-biser*"("0.4.2")
 	}
 	"ru.capjack.csi" {
 		"csi-core-*"("0.4.0")
