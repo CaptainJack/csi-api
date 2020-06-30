@@ -1,14 +1,14 @@
 package ru.capjack.csi.api.sandbox.api.server
 
-import ru.capjack.csi.api.CallbacksRegister
 import ru.capjack.csi.api.ApiMessagePool
+import ru.capjack.csi.api.CallbacksRegister
+import ru.capjack.csi.api.log
+import ru.capjack.csi.api.logS
+import ru.capjack.csi.api.sandbox.api.ApiEncoders
 import ru.capjack.csi.api.server.AbstractApiConnection
 import ru.capjack.csi.core.Connection
 import ru.capjack.tool.io.biser.BiserReader
 import ru.capjack.tool.logging.Logger
-import ru.capjack.csi.api.log
-import ru.capjack.csi.api.sandbox.api.ApiEncoders
-import ru.capjack.csi.api.logS
 
 internal class ApiConnection(
 	logger: Logger,
@@ -20,22 +20,15 @@ internal class ApiConnection(
 	
 	override fun call(serviceId: Int, methodId: Int, message: BiserReader): Boolean {
 		return when (serviceId) {
-			2 -> call(api.session, methodId, message)
-			3 -> call(api.fiends, methodId, message)
+			1 -> call(api.session, methodId, message)
+			2 -> call(api.fiends, methodId, message)
 			else -> false
 		}
 	}
 	
 	private fun call(service: SessionService, methodId: Int, message: BiserReader): Boolean {
 		when (methodId) {
-			2 -> {
-				val a0 = message.readLong()
-				logReceive("session", "addCoins") {
-					log("value", a0)
-				}
-				service.addCoins(a0)
-			}
-			3 -> {
+			1 -> {
 				val r = message.readInt()
 				logReceive("session", "getUser", r) {
 				}
@@ -47,6 +40,13 @@ internal class ApiConnection(
 						write(r0, ApiEncoders.ENTITY_SessionUser)
 					}
 				}
+			}
+			2 -> {
+				val a0 = message.readLong()
+				logReceive("session", "addCoins") {
+					log("value", a0)
+				}
+				service.addCoins(a0)
 			}
 			else -> return false
 		}

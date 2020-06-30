@@ -1,10 +1,10 @@
 package ru.capjack.csi.api.sandbox.api
 
 import ru.capjack.tool.io.biser.Encoder
-import ru.capjack.csi.api.sandbox.api.User.Rank
 
 internal object ApiEncoders{
 	val ENTITY_SessionUser: Encoder<SessionUser> = {
+		writeInt(1)
 		writeLong(it.id)
 		writeString(it.name)
 		writeLong(it.coins)
@@ -13,7 +13,6 @@ internal object ApiEncoders{
 	val ENTITY_User: Encoder<User> = {
 		when (it) {
 			is SessionUser -> {
-				writeInt(1)
 				ENTITY_SessionUser(it)
 			}
 			else -> {
@@ -25,11 +24,11 @@ internal object ApiEncoders{
 		}
 	}
 	
-	val ENUM_User_Rank: Encoder<Rank> = {
+	val ENUM_User_Rank: Encoder<User.Rank> = {
 		writeInt(when (it) {
-			Rank.JUNIOR -> 1
-			Rank.MAJOR -> 2
-			Rank.SENIOR -> 3
+			User.Rank.JUNIOR -> 0
+			User.Rank.MAJOR -> 1
+			User.Rank.SENIOR -> 2
 		})
 	}
 	

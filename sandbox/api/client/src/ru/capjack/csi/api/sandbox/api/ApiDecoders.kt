@@ -3,7 +3,6 @@ package ru.capjack.csi.api.sandbox.api
 import ru.capjack.tool.io.biser.Decoder
 import ru.capjack.tool.io.biser.Decoders
 import ru.capjack.tool.io.biser.UnknownIdDecoderException
-import ru.capjack.csi.api.sandbox.api.User.Rank
 
 internal object ApiDecoders{
 	val ENTITY_SessionUser: Decoder<SessionUser> = {
@@ -30,12 +29,12 @@ internal object ApiDecoders{
 		}
 	}
 	
-	val ENUM_User_Rank: Decoder<Rank> = {
+	val ENUM_User_Rank: Decoder<User.Rank> = {
 		when (val id = readInt()) {
-			1 -> Rank.JUNIOR
-			2 -> Rank.MAJOR
-			3 -> Rank.SENIOR
-			else -> throw UnknownIdDecoderException(id, Rank::class)
+			0 -> User.Rank.JUNIOR
+			1 -> User.Rank.MAJOR
+			2 -> User.Rank.SENIOR
+			else -> throw UnknownIdDecoderException(id, User.Rank::class)
 		}
 	}
 	

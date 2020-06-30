@@ -96,9 +96,16 @@ abstract class AbstractKotlinApiGenerator(
 				}
 			}
 			else {
+//				(type.descriptor as? EntityDescriptor)?.also { visitEntityDescriptor(it, data) }
+				
 				visitGenerated(type, data)
 			}
 		}
+		
+//		private fun visitEntityDescriptor(descriptor: EntityDescriptor, data: LogCallVisitorData) {
+//			data.loggers.add(descriptor.type)
+//			descriptor.children.forEach { visitEntityDescriptor(it.descriptor as EntityDescriptor, data) }
+//		}
 	}
 	
 	private val loggingVisitor = object : TypeVisitor<Unit, GenerateLoggingVisitorData>, StructureDescriptorVisitor<Unit, GenerateLoggingVisitorData> {
@@ -127,12 +134,34 @@ abstract class AbstractKotlinApiGenerator(
 		
 		override fun visitEntityStructureDescriptor(descriptor: EntityDescriptor, data: GenerateLoggingVisitorData) {
 			data.code.apply {
-				line("append('{')")
-				descriptor.fields.forEachIndexed { i, f ->
-					logCall(data.loggers, data.imports, descriptor.fields.lastIndex == i, f.type, f.name, "it.${f.name}")
+				if (descriptor.children.isEmpty()) {
+					visitEntityStructureDescriptor0(descriptor, data)
 				}
-				line("append('}')")
+				else {
+					identBracketsCurly("when (it) ") {
+						descriptor.children.forEach {
+							data.loggers.add(it)
+							line("is ${coders.getTypeName(data.imports, it)} -> ${defineLogName(it)}(it)")
+						}
+						if (descriptor.abstract) {
+							line("else -> throw UnsupportedOperationException()")
+						}
+						else {
+							identBracketsCurly("else -> ") {
+								visitEntityStructureDescriptor0(descriptor, data)
+							}
+						}
+					}
+				}
 			}
+		}
+		
+		private fun CodeBlock.visitEntityStructureDescriptor0(descriptor: EntityDescriptor, data: GenerateLoggingVisitorData) {
+			line("append('{')")
+			descriptor.fields.forEachIndexed { i, f ->
+				logCall(data.loggers, data.imports, descriptor.fields.lastIndex == i, f.type, f.name, "it.${f.name}")
+			}
+			line("append('}')")
 		}
 		
 		override fun visitObjectStructureDescriptor(descriptor: ObjectDescriptor, data: GenerateLoggingVisitorData) {

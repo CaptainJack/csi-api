@@ -1,13 +1,13 @@
 package ru.capjack.csi.api.sandbox.api.client
 
-import ru.capjack.csi.api.CallbacksRegister
 import ru.capjack.csi.api.ApiMessagePool
+import ru.capjack.csi.api.CallbacksRegister
 import ru.capjack.csi.api.client.AbstractApiConnection
+import ru.capjack.csi.api.log
+import ru.capjack.csi.api.logS
 import ru.capjack.csi.core.Connection
 import ru.capjack.tool.io.biser.BiserReader
 import ru.capjack.tool.logging.Logger
-import ru.capjack.csi.api.log
-import ru.capjack.csi.api.logS
 
 internal class ApiConnection(
 	logger: Logger,
@@ -19,21 +19,21 @@ internal class ApiConnection(
 	
 	override fun call(serviceId: Int, methodId: Int, message: BiserReader): Boolean {
 		return when (serviceId) {
-			2 -> call(api.session, methodId, message)
+			1 -> call(api.session, methodId, message)
 			else -> false
 		}
 	}
 	
 	private fun call(service: SessionService, methodId: Int, message: BiserReader): Boolean {
 		when (methodId) {
-			2 -> {
+			1 -> {
 				val a0 = message.readLong()
 				logReceive("session", "updateUserCoins") {
 					log("value", a0)
 				}
 				service.updateUserCoins(a0)
 			}
-			3 -> {
+			2 -> {
 				val r = message.readInt()
 				val a0 = message.readString()
 				logReceive("session", "askQuestion", r) {
@@ -50,7 +50,7 @@ internal class ApiConnection(
 					}
 				}
 			}
-			4 -> {
+			3 -> {
 				val r = message.readInt()
 				val a0 = message.readString()
 				logReceive("session", "askQuestionAgain", r) {

@@ -11,7 +11,6 @@ import ru.capjack.csi.api.sandbox.api.server.FriendsService
 import ru.capjack.csi.core.Connection
 import ru.capjack.tool.logging.Logger
 import ru.capjack.tool.utils.concurrency.ObjectPool
-import kotlin.coroutines.suspendCoroutine
 
 internal class FriendsServiceImpl(
 	serviceId: Int,

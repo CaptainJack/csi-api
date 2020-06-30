@@ -24,20 +24,20 @@ structures:
   - {id: 3, name: SENIOR}
 client:
   path: client.ClientApi
-  lastServiceId: 2
+  lastServiceId: 1
   services:
-  - {id: 2, name: session, type: client.SessionService}
+  - {id: 1, name: session, type: client.SessionService}
 server:
   path: server.ServerApi
-  lastServiceId: 3
+  lastServiceId: 2
   services:
-  - {id: 2, name: session, type: server.SessionService}
-  - {id: 3, name: fiends, type: server.FriendsService}
+  - {id: 1, name: session, type: server.SessionService}
+  - {id: 2, name: fiends, type: server.FriendsService}
 services:
 - path: server.SessionService
-  lastMethodId: 3
+  lastMethodId: 2
   methods:
-  - id: 3
+  - id: 1
     name: getUser
     arguments: []
     result:
@@ -58,23 +58,23 @@ services:
     result:
     - {name: null, type: User*}
 - path: client.SessionService
-  lastMethodId: 4
+  lastMethodId: 3
   methods:
-  - id: 4
+  - id: 3
     name: askQuestionAgain
     arguments:
     - {name: question, type: STRING}
     result:
     - {name: success, type: BOOLEAN}
     - {name: answer, type: STRING}
-  - id: 3
+  - id: 2
     name: askQuestion
     arguments:
     - {name: question, type: STRING}
     result:
     - {name: success, type: BOOLEAN}
     - {name: answer, type: STRING}
-  - id: 2
+  - id: 1
     name: updateUserCoins
     arguments:
     - {name: value, type: LONG}
