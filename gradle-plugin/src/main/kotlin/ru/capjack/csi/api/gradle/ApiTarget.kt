@@ -6,7 +6,8 @@ import ru.capjack.csi.api.generator.model.KotlinApiModelDelegate
 abstract class ApiTarget(
 	val name: String
 ) {
-	private lateinit var project: Project
+	protected lateinit var project: Project
+		private set
 	
 	open fun configureProject(sourceProject: Project) {
 		project = sourceProject.project(sourceProject.path + ":" + name)
@@ -15,9 +16,9 @@ abstract class ApiTarget(
 	abstract fun generate(delegate: KotlinApiModelDelegate)
 	
 	override fun equals(other: Any?) = when {
-		this === other                                                   -> true
+		this === other      -> true
 		other !is ApiTarget -> false
-		else                                                             -> name == other.name
+		else                -> name == other.name
 	}
 	
 	override fun hashCode() = name.hashCode()

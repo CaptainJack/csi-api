@@ -10,8 +10,6 @@ abstract class KotlinApiTarget(
 	private val side: ApiSide,
 	private val platforms: Set<KotlinPlatform>
 ) : ApiTarget(name) {
-	protected lateinit var project: Project
-	
 	override fun configureProject(sourceProject: Project) {
 		super.configureProject(sourceProject)
 		project.pluginManager.apply("org.jetbrains.kotlin.multiplatform")
