@@ -1,24 +1,21 @@
 package ru.capjack.csi.api.sandbox.apiGenerator
 
-import ru.capjack.csi.api.generator.CsiApiGenerator
-import java.nio.file.Path
+import ru.capjack.csi.api.generator.kotlin.ClientKotlinCsiApiGenerator
+import ru.capjack.csi.api.generator.kotlin.KotlinCsiApiGenerator
+import ru.capjack.csi.api.generator.kotlin.ServerKotlinCsiApiGenerator
+import ru.capjack.csi.api.generator.model.KotlinApiModelDelegate
+import ru.capjack.tool.io.biser.generator.CodePath
 import java.nio.file.Paths
 
 fun main() {
 	val projectApiPath = Paths.get("sandbox/api")
 	
-	val generator = CsiApiGenerator("ru.capjack.csi.api.sandbox.api")
+	val delegate = KotlinApiModelDelegate(
+		"ru.capjack.csi.api.sandbox.api",
+		projectApiPath.resolve("src"),
+		projectApiPath.resolve("model.yml")
+	)
 	
-	val modelSnapshotFile = projectApiPath.resolve("model.yml").toFile()
-	
-	if (modelSnapshotFile.exists()) {
-		generator.model.load(modelSnapshotFile.readText())
-	}
-	
-	generator.loadKotlin(projectApiPath.resolve("src"))
-	
-	generator.generateKotlinClient(projectApiPath.resolve("client/src"))
-	generator.generateKotlinServer(projectApiPath.resolve("server/src"))
-	
-	modelSnapshotFile.writeText(generator.model.save())
+	ClientKotlinCsiApiGenerator(delegate.sourcePackage).generate(delegate.model, projectApiPath.resolve("client/src"))
+	ServerKotlinCsiApiGenerator(delegate.sourcePackage).generate(delegate.model, projectApiPath.resolve("server/src"))
 }

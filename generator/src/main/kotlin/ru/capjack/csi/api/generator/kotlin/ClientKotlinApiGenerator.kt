@@ -9,7 +9,7 @@ import java.nio.file.Path
 class ClientKotlinApiGenerator(
 	targetPackage: CodePath,
 	coders: KotlinCodersGenerator
-) : AbstractKotlinApiGenerator(coders, targetPackage, "client") {
+) : KotlinApiGenerator(coders, targetPackage, "client") {
 	override fun generate(model: ApiModel, targetSrc: Path) {
 		generate(model.client, model.server, targetSrc)
 	}

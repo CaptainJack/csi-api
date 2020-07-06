@@ -18,7 +18,7 @@ import ru.capjack.tool.io.biser.generator.kotlin.KotlinFile
 import ru.capjack.tool.io.biser.generator.model.*
 import java.nio.file.Path
 
-abstract class AbstractKotlinApiGenerator(
+abstract class KotlinApiGenerator(
 	private val coders: KotlinCodersGenerator,
 	private val targetPackage: CodePath,
 	private val side: String
