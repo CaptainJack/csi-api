@@ -4,9 +4,9 @@ import org.jetbrains.kotlin.gradle.targets.js.KotlinJsTarget
 import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
 
 plugins {
-	kotlin("multiplatform") version "1.3.61" apply false
-	id("nebula.release") version "14.1.0"
-	id("ru.capjack.depver") version "1.0.0"
+	kotlin("multiplatform") version "1.3.72" apply false
+	id("nebula.release") version "15.1.0"
+	id("ru.capjack.depver") version "1.1.0"
 	id("ru.capjack.bintray") version "1.0.0"
 	id("ru.capjack.logging") version "1.1.0"
 }
