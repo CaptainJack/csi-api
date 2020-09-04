@@ -1,6 +1,7 @@
 package ru.capjack.csi.api.generator.model
 
 import ru.capjack.tool.io.biser.generator.CodePath
+import ru.capjack.tool.io.biser.generator.model.Change
 import ru.capjack.tool.io.biser.generator.model.Model
 import ru.capjack.tool.utils.collections.getOrAdd
 import ru.capjack.tool.utils.collections.mutableKeyedSetOf
@@ -14,13 +15,32 @@ class ApiModel : Model() {
 	val server: Api get() = _server
 	
 	private val services = mutableKeyedSetOf<CodePath, ServiceDescriptorImpl> { it.path }
+	private val oldServicesPaths = mutableSetOf<CodePath>()
 	
 	fun provideServicesDescriptor(name: String): ServiceDescriptor {
 		return provideServicesDescriptorImpl(name)
 	}
 	
 	private fun provideServicesDescriptorImpl(path: String): ServiceDescriptorImpl {
-		return services.getOrAdd(CodePath(path), ::ServiceDescriptorImpl)
+		val key = CodePath(path)
+		oldServicesPaths.remove(key)
+		return services.getOrAdd(key, ::ServiceDescriptorImpl)
+	}
+	
+	
+	override fun beginUpdate() {
+		super.beginUpdate()
+		oldServicesPaths.addAll(services.map(ServiceDescriptor::path))
+	}
+	
+	override fun completeUpdate() {
+		val changed = oldServicesPaths.fold(false) { r, it -> services.removeKey(it) != null || r }
+		if (changed) {
+			raiseChange(Change.FULL)
+		}
+		oldServicesPaths.clear()
+		
+		super.completeUpdate()
 	}
 	
 	@Suppress("UNCHECKED_CAST")

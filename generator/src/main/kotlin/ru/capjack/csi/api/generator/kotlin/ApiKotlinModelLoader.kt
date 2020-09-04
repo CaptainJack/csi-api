@@ -45,6 +45,9 @@ class ApiKotlinModelLoader(
 			api.updatePath(name)
 		)
 		
+		
+		val oldServiceNames = api.services.map { it.name }.toMutableSet()
+		
 		descriptor.unsubstitutedMemberScope.getContributedDescriptors().asSequence()
 			.filterIsInstance<PropertyDescriptor>()
 			.forEach {
@@ -52,28 +55,41 @@ class ApiKotlinModelLoader(
 				val serviceDescriptorName = extractName(serviceDescriptor)
 					?: throw GeneratorException(it.toString())
 				
+				val serviceName = it.name.toString()
+				oldServiceNames.remove(serviceName)
+				
 				change = change.raiseTo(
-					api.provideService(it.name.toString(), loadService(serviceDescriptorName, serviceDescriptor))
+					api.provideService(serviceName, loadService(serviceDescriptorName, serviceDescriptor))
 				)
 			}
+		
+		change = change.raiseTo(api.removeServices(oldServiceNames))
 		
 		model.raiseChange(change)
 	}
 	
 	private fun loadService(name: String, descriptor: ClassDescriptor): ServiceDescriptor {
 		val service = model.provideServicesDescriptor(name)
+		var change = Change.ABSENT
+		
+		val oldMethodsNames = service.methods.map { it.name }.toMutableSet()
 		
 		descriptor.unsubstitutedMemberScope.getContributedDescriptors().asSequence()
 			.filterIsInstance<FunctionDescriptor>()
 			.filter { it.kind == CallableMemberDescriptor.Kind.DECLARATION }
 			.forEach {
-				loadServiceMethod(service, it)
+				oldMethodsNames.remove(it.name.toString())
+				change = change.raiseTo(loadServiceMethod(service, it))
 			}
+		
+		change = change.raiseTo(service.removeMethods(oldMethodsNames))
+		
+		model.raiseChange(change)
 		
 		return service
 	}
 	
-	private fun loadServiceMethod(service: ServiceDescriptor, descriptor: FunctionDescriptor) {
+	private fun loadServiceMethod(service: ServiceDescriptor, descriptor: FunctionDescriptor): Change {
 		val arguments = mutableListOf<Parameter>()
 		
 		var result: List<Parameter>? = null
@@ -92,6 +108,6 @@ class ApiKotlinModelLoader(
 			}
 		}
 		
-		service.provideMethod(descriptor.name.toString(), arguments, result)
+		return service.provideMethod(descriptor.name.toString(), arguments, result)
 	}
 }

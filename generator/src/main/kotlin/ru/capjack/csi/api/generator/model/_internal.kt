@@ -30,6 +30,11 @@ internal class ApiImpl(override var path: CodePath) : Api {
 		}
 		return Change.ABSENT
 	}
+	
+	override fun removeServices(names: Collection<String>): Change {
+		val changed = names.fold(false) { r, it -> services.removeKey(it) != null || r }
+		return if (changed) Change.FULL else Change.ABSENT
+	}
 }
 
 internal class ServiceImpl(
@@ -50,6 +55,11 @@ internal class ServiceDescriptorImpl(override val path: CodePath) : ServiceDescr
 			return Change.COMPATIBLY
 		}
 		return method.update(arguments, result)
+	}
+	
+	override fun removeMethods(names: Collection<String>): Change {
+		val changed = names.fold(false) { r, it -> methods.removeKey(it) != null || r }
+		return if (changed) Change.FULL else Change.ABSENT
 	}
 	
 	override fun equals(other: Any?): Boolean {

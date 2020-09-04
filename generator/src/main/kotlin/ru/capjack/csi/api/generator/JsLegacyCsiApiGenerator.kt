@@ -225,6 +225,8 @@ class JsLegacyCsiApiGenerator : CsiApiGenerator {
 				line("import DataReader from \"../../io/DataReader\";")
 				line("import { DataTypes } from \"../../io/DataTypes\";")
 				
+				val hasParent = desc.parent != null
+				
 				desc.parent.also { p ->
 					if (p == null) {
 						line("import Entity from \"../../io/Entity\";")
@@ -234,7 +236,19 @@ class JsLegacyCsiApiGenerator : CsiApiGenerator {
 						line("import $n from \"./$n\";")
 					}
 				}
-				desc.fields.map { it.type }.forEach {
+				
+				val fields = if (hasParent) desc.fields.filter { f ->
+					var p = desc.parent!!.descriptor as EntityDescriptor?
+					while (p != null) {
+						if (p.fields.any { it.name == f.name }) return@filter false
+						p = p.parent?.descriptor as EntityDescriptor?
+					}
+					
+					true
+				}
+				else desc.fields
+				
+				fields.map { it.type }.forEach {
 					if (it is StructureType) {
 						val n = it.tsName()
 						if (it.descriptor is EnumDescriptor) {
@@ -259,8 +273,8 @@ class JsLegacyCsiApiGenerator : CsiApiGenerator {
 					line("static readonly ID: number = ${desc.id};")
 					line()
 					
-					if (desc.fields.isNotEmpty()) {
-						desc.fields.forEach {
+					if (fields.isNotEmpty()) {
+						fields.forEach {
 							line("public ${it.name}: " + it.type.accept(typeNameVisitor) + " = " + it.type.accept(typeDefaultValueVisitor) + ";")
 						}
 						line()
@@ -271,12 +285,11 @@ class JsLegacyCsiApiGenerator : CsiApiGenerator {
 						line("this.setEId($name.ID);")
 					}
 					
-					if (desc.fields.isNotEmpty()) {
-						val hasParent = desc.parent != null
+					if (fields.isNotEmpty()) {
 						line()
 						identBracketsCurly("public write(writer: DataWriter) ") {
 							if (hasParent) line("super.write(writer);")
-							desc.fields.forEach {
+							fields.forEach {
 								line {
 									append(it.type.accept(writeVisitor, it.name))
 									append(';')
@@ -287,7 +300,7 @@ class JsLegacyCsiApiGenerator : CsiApiGenerator {
 						line()
 						identBracketsCurly("public read(reader: DataReader) ") {
 							if (hasParent) line("super.read(reader);")
-							desc.fields.forEach {
+							fields.forEach {
 								line {
 									append("this.").append(it.name).append(" = ").append(it.type.accept(readVisitor)).append(';')
 								}

@@ -7,6 +7,7 @@ import ru.capjack.tool.io.biser.generator.model.Type
 interface Api {
 	fun updatePath(value: String): Change
 	fun provideService(name: String, descriptor: ServiceDescriptor): Change
+	fun removeServices(names: Collection<String>): Change
 	
 	val path: CodePath
 	val services: Collection<Service>
@@ -23,6 +24,7 @@ interface ServiceDescriptor {
 	val methods: Collection<Method>
 	
 	fun provideMethod(name: String, arguments: List<Parameter>, result: List<Parameter>?): Change
+	fun removeMethods(names: Collection<String>): Change
 }
 
 interface Method {
