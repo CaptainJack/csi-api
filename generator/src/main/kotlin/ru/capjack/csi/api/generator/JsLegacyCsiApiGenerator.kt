@@ -57,7 +57,7 @@ class JsLegacyCsiApiGenerator : CsiApiGenerator {
 		}
 		
 		override fun visitNullableType(type: NullableType, data: Unit): String {
-			throw UnsupportedOperationException()
+			return type.original.accept(this)
 		}
 		
 	}
@@ -88,7 +88,7 @@ class JsLegacyCsiApiGenerator : CsiApiGenerator {
 		}
 		
 		override fun visitNullableType(type: NullableType, data: Unit): String {
-			throw UnsupportedOperationException()
+			return "null"
 		}
 		
 	}
@@ -136,7 +136,7 @@ class JsLegacyCsiApiGenerator : CsiApiGenerator {
 		}
 		
 		override fun visitNullableType(type: NullableType, data: String): String {
-			throw UnsupportedOperationException()
+			return type.original.accept(this, data)
 		}
 		
 	}
@@ -186,7 +186,7 @@ class JsLegacyCsiApiGenerator : CsiApiGenerator {
 		}
 		
 		override fun visitNullableType(type: NullableType, data: Unit): String {
-			throw UnsupportedOperationException()
+			return type.original.accept(this, data)
 		}
 		
 	}
