@@ -111,6 +111,9 @@ class JsLegacyCsiApiGenerator : CsiApiGenerator {
 		}
 		
 		override fun visitStructureType(type: StructureType, data: String): String {
+			if (type.descriptor is EnumDescriptor) {
+				return "writer.writeEnum(this.$data)"
+			}
 			return "writer.writeEntity(this.$data)"
 		}
 		
@@ -156,6 +159,9 @@ class JsLegacyCsiApiGenerator : CsiApiGenerator {
 		}
 		
 		override fun visitStructureType(type: StructureType, data: Unit): String {
+			if (type.descriptor is EnumDescriptor) {
+				return "<${type.accept(typeNameVisitor)}>reader.readEnum()"
+			}
 			return "<${type.accept(typeNameVisitor)}>reader.readEntity()"
 		}
 		
