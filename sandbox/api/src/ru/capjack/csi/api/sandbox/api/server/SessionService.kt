@@ -6,5 +6,5 @@ import ru.capjack.csi.api.sandbox.api.SessionUser
 interface SessionService {
 	fun getUser(callback: Callback<SessionUser>)
 	
-	fun addCoins(value: Long)
+	fun addCoins(value: Long, reason: String?)
 }

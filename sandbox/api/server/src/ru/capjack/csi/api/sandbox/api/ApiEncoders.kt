@@ -6,7 +6,7 @@ internal object ApiEncoders{
 	val ENTITY_SessionUser: Encoder<SessionUser> = {
 		writeInt(1)
 		writeLong(it.id)
-		writeString(it.name)
+		writeStringNullable(it.name)
 		writeLong(it.coins)
 	}
 	
@@ -18,7 +18,7 @@ internal object ApiEncoders{
 			else -> {
 				writeInt(2)
 				writeLong(it.id)
-				writeString(it.name)
+				writeStringNullable(it.name)
 				write(it.rank, ENUM_User_Rank)
 			}
 		}

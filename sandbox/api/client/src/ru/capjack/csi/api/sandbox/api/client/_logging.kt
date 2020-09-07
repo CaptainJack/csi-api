@@ -8,9 +8,13 @@ import ru.capjack.csi.api.sandbox.api.User
 internal val LOG_ENTITY_SessionUser: StringBuilder.(SessionUser) -> Unit = {
 	append('{')
 	logS("id", it.id)
-	logS("name", it.name)
+	logS("name", it.name, LOG_NULLABLE_STRING)
 	log("coins", it.coins)
 	append('}')
+}
+
+internal val LOG_NULLABLE_STRING: StringBuilder.(String?) -> Unit = {
+	if (it == null) append("NULL") else log(it, LOG_STRING)
 }
 
 internal val LOG_ENTITY_User: StringBuilder.(User) -> Unit = {
@@ -19,10 +23,14 @@ internal val LOG_ENTITY_User: StringBuilder.(User) -> Unit = {
 		else -> {
 			append('{')
 			logS("id", it.id)
-			logS("name", it.name)
+			logS("name", it.name, LOG_NULLABLE_STRING)
 			log("rank", it.rank.name)
 			append('}')
 		}
 	}
+}
+
+internal val LOG_STRING: StringBuilder.(String) -> Unit = {
+	log(it)
 }
 

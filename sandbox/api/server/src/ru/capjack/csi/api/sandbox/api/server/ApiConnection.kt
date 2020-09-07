@@ -43,10 +43,12 @@ internal class ApiConnection(
 			}
 			2 -> {
 				val a0 = message.readLong()
+				val a1 = message.readStringNullable()
 				logReceive("session", "addCoins") {
-					log("value", a0)
+					logS("value", a0)
+					log("reason", a1, LOG_NULLABLE_STRING)
 				}
-				service.addCoins(a0)
+				service.addCoins(a0, a1)
 			}
 			else -> return false
 		}

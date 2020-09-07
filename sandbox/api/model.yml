@@ -6,7 +6,7 @@ structures:
   abstract: false
   fields:
   - {name: id, type: LONG}
-  - {name: name, type: STRING}
+  - {name: name, type: STRING!}
   - {name: coins, type: LONG}
 - name: User
   id: 2
@@ -14,7 +14,7 @@ structures:
   abstract: false
   fields:
   - {name: id, type: LONG}
-  - {name: name, type: STRING}
+  - {name: name, type: STRING!}
   - {name: rank, type: User.Rank}
 - name: User.Rank
   lastValueId: 3
@@ -46,6 +46,7 @@ services:
     name: addCoins
     arguments:
     - {name: value, type: LONG}
+    - {name: reason, type: STRING!}
     result: null
 - path: server.FriendsService
   lastMethodId: 1

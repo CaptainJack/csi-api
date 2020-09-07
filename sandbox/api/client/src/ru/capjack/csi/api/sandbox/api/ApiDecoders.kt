@@ -8,7 +8,7 @@ internal object ApiDecoders{
 	val ENTITY_SessionUser: Decoder<SessionUser> = {
 		SessionUser(
 			readLong(),
-			readString(),
+			readStringNullable(),
 			readLong()
 		)
 	}
@@ -16,7 +16,7 @@ internal object ApiDecoders{
 	private val ENTITY_User_RAW: Decoder<User> = {
 		User(
 			readLong(),
-			readString(),
+			readStringNullable(),
 			read(ENUM_User_Rank)
 		)
 	}

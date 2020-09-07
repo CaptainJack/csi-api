@@ -4,6 +4,7 @@ import ru.capjack.csi.api.AbstractService
 import ru.capjack.csi.api.CallbacksRegister
 import ru.capjack.csi.api.OutputApiMessage
 import ru.capjack.csi.api.log
+import ru.capjack.csi.api.logS
 import ru.capjack.csi.api.sandbox.api.ApiDecoders
 import ru.capjack.csi.api.sandbox.api.SessionUser
 import ru.capjack.csi.api.sandbox.api.server.SessionService
@@ -33,12 +34,14 @@ internal class SessionServiceImpl(
 		send(1, c)
 	}
 	
-	override fun addCoins(value: Long) {
+	override fun addCoins(value: Long, reason: String?) {
 		logSend("addCoins") {
-			log("value", value)
+			logS("value", value)
+			log("reason", reason, LOG_NULLABLE_STRING)
 		}
 		send(2) {
 			writeLong(value)
+			writeStringNullable(reason)
 		}
 	}
 }
