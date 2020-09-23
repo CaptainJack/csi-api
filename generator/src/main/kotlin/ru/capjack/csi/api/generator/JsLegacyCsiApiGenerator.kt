@@ -343,6 +343,9 @@ class JsLegacyCsiApiGenerator : CsiApiGenerator {
 				model.server.services.forEach {
 					line("public static readonly CSI_SERVICE_${it.name.toUpperUnderscoreCase()} = ${it.id};")
 				}
+				model.client.services.forEach {
+					line("public static readonly CSI_SERVICE_ACTIONS_${it.name.toUpperUnderscoreCase()} = ${it.id};")
+				}
 				line()
 				line("// > Server actions")
 				model.server.services.forEach { s ->
