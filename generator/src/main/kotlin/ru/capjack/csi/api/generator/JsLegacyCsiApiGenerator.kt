@@ -325,8 +325,8 @@ class JsLegacyCsiApiGenerator : CsiApiGenerator {
 			model.structures.filterIsInstance<EnumDescriptor>().forEach {
 				identBracketsCurly("export enum ${it.tsName()} ") {
 					it.values.forEachIndexed { i, v ->
-						if (i == it.values.lastIndex) line(v.name)
-						else line("${v.name},")
+						if (i == it.values.lastIndex) line("${v.name} = ${v.id - 1}")
+						else line("${v.name} = ${v.id - 1},")
 					}
 				}
 				line()
