@@ -5,8 +5,8 @@ import ru.capjack.tool.io.InputByteBuffer
 import ru.capjack.tool.io.biser.BiserReader
 import ru.capjack.tool.io.biser.BiserWriter
 import ru.capjack.tool.logging.Logger
-import ru.capjack.tool.utils.concurrency.ObjectPool
-import ru.capjack.tool.utils.concurrency.use
+import ru.capjack.tool.utils.pool.ObjectPool
+import ru.capjack.tool.utils.pool.use
 
 abstract class AbstractService(
 	private val serviceId: Int,

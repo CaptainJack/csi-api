@@ -4,7 +4,6 @@ plugins {
 }
 
 dependencies {
-	implementation(kotlin("stdlib-jdk8"))
 	implementation(kotlin("compiler-embeddable"))
 	
 	implementation("ru.capjack.tool:tool-utils")

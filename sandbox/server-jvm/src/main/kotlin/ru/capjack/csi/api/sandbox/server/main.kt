@@ -16,10 +16,10 @@ import ru.capjack.tool.io.ArrayByteBuffer
 import ru.capjack.tool.io.ByteBuffer
 import ru.capjack.tool.io.InputByteBuffer
 import ru.capjack.tool.logging.Logging
-import ru.capjack.tool.utils.concurrency.ArrayObjectPool
-import ru.capjack.tool.utils.concurrency.ExecutorDelayableAssistant
-import ru.capjack.tool.utils.concurrency.ObjectAllocator
-import ru.capjack.tool.utils.concurrency.ObjectPool
+import ru.capjack.tool.utils.assistant.ExecutorDelayableAssistant
+import ru.capjack.tool.utils.pool.ArrayObjectPool
+import ru.capjack.tool.utils.pool.ObjectAllocator
+import ru.capjack.tool.utils.pool.ObjectPool
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
@@ -93,7 +93,7 @@ class SbServerApi(private val identity: Int, private val client: InternalClientA
 			callback(sessionUser)
 		}
 		
-		override fun addCoins(value: Long) {
+		override fun addCoins(value: Long, reason: String?) {
 			println("$identity addCoins $value")
 			sessionUser.coins += value
 			client.session.updateUserCoins(sessionUser.coins)

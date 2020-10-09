@@ -204,7 +204,7 @@ abstract class KotlinApiGenerator(
 			addImport("ru.capjack.csi.core.$side.ConnectionHandler")
 			addImport("ru.capjack.tool.io.ByteBuffer")
 			addImport("ru.capjack.tool.logging.Logging")
-			addImport("ru.capjack.tool.utils.concurrency.ObjectPool")
+			addImport("ru.capjack.tool.utils.pool.ObjectPool")
 			
 			
 			val iaName = "Internal" + innerApi.path.name
@@ -271,7 +271,7 @@ abstract class KotlinApiGenerator(
 			addImport("ru.capjack.csi.api.OutputApiMessage")
 			addImport("ru.capjack.csi.core.Connection")
 			addImport("ru.capjack.tool.logging.Logger")
-			addImport("ru.capjack.tool.utils.concurrency.ObjectPool")
+			addImport("ru.capjack.tool.utils.pool.ObjectPool")
 			
 			line("internal class $name(")
 			ident {
@@ -299,7 +299,7 @@ abstract class KotlinApiGenerator(
 			addImport("ru.capjack.csi.api.OutputApiMessage")
 			addImport("ru.capjack.csi.core.Connection")
 			addImport("ru.capjack.tool.logging.Logger")
-			addImport("ru.capjack.tool.utils.concurrency.ObjectPool")
+			addImport("ru.capjack.tool.utils.pool.ObjectPool")
 			
 			line("internal class ${name}Impl(")
 			ident {

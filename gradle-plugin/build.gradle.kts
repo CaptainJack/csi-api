@@ -7,7 +7,6 @@ plugins {
 }
 
 dependencies {
-	implementation(kotlin("stdlib-jdk8"))
 	implementation(kotlin("gradle-plugin"))
 	implementation(project(":csi-api-generator"))
 }

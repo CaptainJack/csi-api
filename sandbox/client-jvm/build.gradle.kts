@@ -3,8 +3,6 @@ plugins {
 }
 
 dependencies {
-	implementation(kotlin("stdlib-jdk8"))
-	
 	implementation(project(":runtime:csi-api-client"))
 	implementation(project(":sandbox:api:client"))
 	

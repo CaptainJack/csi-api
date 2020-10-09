@@ -6,7 +6,9 @@ plugins {
 
 kotlin {
 	jvm()
-	js()
+	js(IR) {
+		browser()
+	}
 	
 	emptySourceSets("common")
 	emptySourceSets("jvm")
@@ -14,17 +16,9 @@ kotlin {
 	
 	sourceSets.getByName("commonMain") {
 		dependencies {
-			implementation(kotlin("stdlib-common"))
 			implementation(project(":runtime:csi-api-common"))
 		}
 		kotlin.setSrcDirs(listOf("src"))
-	}
-	
-	sourceSets.getByName("jvmMain").dependencies {
-		implementation(kotlin("stdlib-jdk8"))
-	}
-	sourceSets.getByName("jsMain").dependencies {
-		implementation(kotlin("stdlib-js"))
 	}
 }
 
@@ -39,21 +33,15 @@ subprojects {
 		
 		sourceSets.getByName("commonMain") {
 			dependencies {
-				implementation(kotlin("stdlib-common"))
 				api(project(":sandbox:api"))
 				api(project(":runtime:csi-api-${project.name}"))
 			}
 			kotlin.setSrcDirs(listOf("src"))
 		}
 		
-		sourceSets.getByName("jvmMain").dependencies {
-			implementation(kotlin("stdlib-jdk8"))
-		}
-		
 		if (name == "client") {
-			js()
-			sourceSets.getByName("jsMain").dependencies {
-				implementation(kotlin("stdlib-js"))
+			js(IR) {
+				browser()
 			}
 		}
 	}

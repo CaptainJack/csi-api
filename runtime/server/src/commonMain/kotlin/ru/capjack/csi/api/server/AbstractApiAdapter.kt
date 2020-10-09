@@ -6,7 +6,7 @@ import ru.capjack.csi.core.Connection
 import ru.capjack.csi.core.server.ConnectionAcceptor
 import ru.capjack.csi.core.server.ConnectionHandler
 import ru.capjack.tool.io.ByteBuffer
-import ru.capjack.tool.utils.concurrency.ObjectPool
+import ru.capjack.tool.utils.pool.ObjectPool
 
 abstract class AbstractApiAdapter<I : Any, IA : InnerApi, OA : OuterApi>(
 	private val sluice: ApiSluice<I, IA, OA>,

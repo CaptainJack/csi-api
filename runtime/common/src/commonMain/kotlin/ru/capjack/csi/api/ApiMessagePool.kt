@@ -3,9 +3,9 @@ package ru.capjack.csi.api
 import ru.capjack.tool.io.ByteBuffer
 import ru.capjack.tool.io.DummyInputByteBuffer
 import ru.capjack.tool.io.biser.ByteBufferBiserReader
-import ru.capjack.tool.utils.concurrency.ArrayObjectPool
-import ru.capjack.tool.utils.concurrency.ObjectAllocator
-import ru.capjack.tool.utils.concurrency.ObjectPool
+import ru.capjack.tool.utils.pool.ArrayObjectPool
+import ru.capjack.tool.utils.pool.ObjectAllocator
+import ru.capjack.tool.utils.pool.ObjectPool
 
 interface ApiMessagePool {
 	val readers: ObjectPool<ByteBufferBiserReader>

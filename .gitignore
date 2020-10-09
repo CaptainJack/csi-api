@@ -4,3 +4,6 @@
 .gradle/
 build/
 out/
+client/
+model.yml
+server/

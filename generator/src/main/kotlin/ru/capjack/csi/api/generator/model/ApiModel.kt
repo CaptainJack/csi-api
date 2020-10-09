@@ -8,8 +8,8 @@ import ru.capjack.tool.utils.collections.mutableKeyedSetOf
 import kotlin.math.max
 
 class ApiModel : Model() {
-	private val _client = ApiImpl(CodePath("client.ClientApi"))
-	private val _server = ApiImpl(CodePath("server.ServerApi"))
+	private val _client = ApiImpl(CodePath("ClientApi"))
+	private val _server = ApiImpl(CodePath("ServerApi"))
 	
 	val client: Api get() = _client
 	val server: Api get() = _server

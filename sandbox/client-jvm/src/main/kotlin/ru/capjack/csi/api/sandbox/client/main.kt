@@ -14,10 +14,10 @@ import ru.capjack.csi.transport.netty.common.factoryEventLoopGroup
 import ru.capjack.tool.io.ArrayByteBuffer
 import ru.capjack.tool.io.ByteBuffer
 import ru.capjack.tool.logging.Logging
-import ru.capjack.tool.utils.concurrency.ArrayObjectPool
-import ru.capjack.tool.utils.concurrency.ExecutorDelayableAssistant
-import ru.capjack.tool.utils.concurrency.ObjectAllocator
-import ru.capjack.tool.utils.concurrency.ObjectPool
+import ru.capjack.tool.utils.assistant.ExecutorDelayableAssistant
+import ru.capjack.tool.utils.pool.ArrayObjectPool
+import ru.capjack.tool.utils.pool.ObjectAllocator
+import ru.capjack.tool.utils.pool.ObjectPool
 import java.net.URI
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit

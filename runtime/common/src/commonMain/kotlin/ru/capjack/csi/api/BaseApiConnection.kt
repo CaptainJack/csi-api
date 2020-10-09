@@ -9,7 +9,7 @@ import ru.capjack.tool.io.biser.BiserWriter
 import ru.capjack.tool.logging.Logger
 import ru.capjack.tool.logging.debug
 import ru.capjack.tool.logging.error
-import ru.capjack.tool.utils.concurrency.use
+import ru.capjack.tool.utils.pool.use
 
 abstract class BaseApiConnection<IA : BaseInnerApi>(
 	protected val logger: Logger,

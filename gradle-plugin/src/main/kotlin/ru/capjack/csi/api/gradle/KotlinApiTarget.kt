@@ -35,21 +35,13 @@ abstract class KotlinApiTarget(
 			jvm {
 				compilations.all { kotlinOptions.jvmTarget = "1.8" }
 			}
-			sourceSets.getByName("jvmMain") {
-				dependencies {
-					implementation(kotlin("stdlib-jdk8"))
-				}
-			}
 		}
 	}
 	
 	private fun Project.configureJs() {
 		kmp {
-			js()
-			sourceSets.getByName("jsMain") {
-				dependencies {
-					implementation(kotlin("stdlib-js"))
-				}
+			js(IR) {
+				browser()
 			}
 		}
 	}
@@ -58,7 +50,6 @@ abstract class KotlinApiTarget(
 		kmp {
 			sourceSets.getByName("commonMain") {
 				dependencies {
-					implementation(kotlin("stdlib-common"))
 					api("ru.capjack.csi:csi-api-${side.name.toLowerCase()}")
 					api(project(project.parent!!.path))
 				}
