@@ -1,9 +1,5 @@
-/tmp/
-/.idea/
+/.gradle
+/.idea
+/tmp
 
-.gradle/
-build/
-out/
-client/
-model.yml
-server/
+build

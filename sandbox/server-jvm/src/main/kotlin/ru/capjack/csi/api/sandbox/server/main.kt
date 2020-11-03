@@ -15,8 +15,9 @@ import ru.capjack.csi.transport.netty.server.WebSocketChannelGate
 import ru.capjack.tool.io.ArrayByteBuffer
 import ru.capjack.tool.io.ByteBuffer
 import ru.capjack.tool.io.InputByteBuffer
+import ru.capjack.tool.io.getInt
 import ru.capjack.tool.logging.Logging
-import ru.capjack.tool.utils.assistant.ExecutorDelayableAssistant
+import ru.capjack.tool.utils.assistant.ExecutorTemporalAssistant
 import ru.capjack.tool.utils.pool.ArrayObjectPool
 import ru.capjack.tool.utils.pool.ObjectAllocator
 import ru.capjack.tool.utils.pool.ObjectPool
@@ -37,7 +38,7 @@ fun main() {
 		override fun disposeInstance(instance: ByteBuffer): Unit = instance.clear()
 	})
 	
-	val assistant = ExecutorDelayableAssistant(assistantExecutor)
+	val assistant = ExecutorTemporalAssistant(assistantExecutor)
 	val connectionAuthorizer = SbConnectionAuthorizer()
 	val connectionAcceptor = ApiAdapter(SbApiSluice(), byteBuffers)
 	val gate = WebSocketChannelGate(elg, "localhost:7777")
@@ -72,8 +73,8 @@ fun main() {
 
 
 class SbConnectionAuthorizer() : ConnectionAuthorizer<Int> {
-	override fun authorizeConnection(authorizationKey: InputByteBuffer): Int? {
-		return if (authorizationKey.isReadable(4)) authorizationKey.readInt().takeIf { it > 0 }
+	override fun authorizeConnection(key: ByteArray): Int? {
+		return if (key.size >= 4) key.getInt(0).takeIf { it > 0 }
 		else null
 	}
 }

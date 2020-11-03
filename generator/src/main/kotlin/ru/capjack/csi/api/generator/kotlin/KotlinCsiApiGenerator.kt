@@ -6,13 +6,17 @@ import ru.capjack.tool.io.biser.generator.CodePath
 import ru.capjack.tool.io.biser.generator.kotlin.KotlinCodersGenerator
 import java.nio.file.Path
 
-abstract class KotlinCsiApiGenerator(private val sourcePackage: CodePath) : CsiApiGenerator {
+abstract class KotlinCsiApiGenerator(protected val sourcePackage: CodePath) : CsiApiGenerator {
 	override fun generate(model: ApiModel, path: Path) {
-		val codersGenerator = KotlinCodersGenerator(sourcePackage, true)
+		val codersGenerator = createCodersGenerator()
 		createApiGenerator(sourcePackage, codersGenerator).generate(model, path)
 		codersGenerator.generate(path)
 	}
 	
 	protected abstract fun createApiGenerator(sourcePackage: CodePath, codersGenerator: KotlinCodersGenerator): KotlinApiGenerator
+	
+	protected open fun createCodersGenerator(): KotlinCodersGenerator {
+		return KotlinCodersGenerator(sourcePackage, true)
+	}
 }
 

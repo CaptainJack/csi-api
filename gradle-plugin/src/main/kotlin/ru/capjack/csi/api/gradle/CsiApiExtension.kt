@@ -1,15 +1,13 @@
 package ru.capjack.csi.api.gradle
 
 import org.gradle.api.Project
-import org.gradle.kotlin.dsl.getByType
-import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import java.io.File
 
 open class CsiApiExtension(private val project: Project) {
 	
 	private val _targets = mutableSetOf<ApiTarget>()
 	
-	var modelSnapshotFile: File = project.file("model.yml")
+	var modelSnapshotFile: File = project.file("src/model.yml")
 	var sourcePackage = defineSourcePackage(project.kmpSourceDirCommonMain, "")
 	
 	val targets: Set<ApiTarget> get() = _targets
@@ -20,11 +18,15 @@ open class CsiApiExtension(private val project: Project) {
 		}
 	}
 	
-	fun targetKotlinClient(name: String = "client", vararg platforms: KotlinPlatform = arrayOf(KotlinPlatform.JS)) {
+	fun targetClientJsKotlin(name: String = "client", module: String = "csi") {
+		target(ClientJsKotlinApiTarget(name, module))
+	}
+	
+	fun targetClientKotlin(name: String = "client", vararg platforms: KotlinPlatform = arrayOf(KotlinPlatform.JS)) {
 		target(ClientKotlinApiTarget(name, platforms.toSet()))
 	}
 	
-	fun targetKotlinServer(name: String = "server") {
+	fun targetServerKotlin(name: String = "server") {
 		target(ServerKotlinApiTarget(name))
 	}
 }

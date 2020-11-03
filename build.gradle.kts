@@ -4,7 +4,7 @@ import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
 
 plugins {
 	kotlin("multiplatform") version "1.4.10" apply false
-	id("nebula.release") version "15.2.0"
+	id("nebula.release") version "15.3.0"
 	id("ru.capjack.depver") version "1.2.0"
 	id("ru.capjack.bintray") version "1.0.0"
 }
@@ -12,13 +12,13 @@ plugins {
 depver {
 	"ru.capjack.tool" {
 		"tool-lang"("1.5.0")
-		"tool-utils"("0.15.0")
+		"tool-utils"("1.0.0")
 		"tool-logging"("1.2.0")
-		"tool-io-biser*"("0.7.0")
+		"tool-io-biser*"("0.7.1")
 	}
 	"ru.capjack.csi" {
-		"csi-core-*"("0.5.0-dev.3+011d4ed")
-		"csi-transport-*"("0.3.0-dev.2.uncommitted+f1d5818")
+		"csi-core-*"("0.5.0")
+		"csi-transport-*"("0.3.0")
 	}
 }
 

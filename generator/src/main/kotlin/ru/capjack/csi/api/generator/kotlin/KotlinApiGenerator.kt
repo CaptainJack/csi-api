@@ -19,8 +19,8 @@ import ru.capjack.tool.io.biser.generator.model.*
 import java.nio.file.Path
 
 abstract class KotlinApiGenerator(
-	private val coders: KotlinCodersGenerator,
-	private val targetPackage: CodePath,
+	protected val coders: KotlinCodersGenerator,
+	protected val targetPackage: CodePath,
 	private val side: String
 ) {
 	private class LogCallVisitorData(
@@ -169,28 +169,32 @@ abstract class KotlinApiGenerator(
 		}
 	}
 	
-	abstract fun generate(model: ApiModel, targetSrc: Path)
-	
-	protected fun generate(innerApi: Api, outerApi: Api, targetSrc: Path) {
+	open fun generate(model: ApiModel, targetSrc: Path) {
 		targetSrc.toFile().deleteRecursively()
+		
+		val files = mutableListOf<CodeFile>()
+		generate(model, files)
+		
+		files.forEach { it.write(targetSrc) }
+	}
+	
+	protected abstract fun generate(model: ApiModel, files: MutableList<CodeFile>)
+	
+	protected open fun generate(innerApi: Api, outerApi: Api, files: MutableList<CodeFile>) {
 		
 		val loggers = TypeAggregator()
 		
-		val files = mutableListOf(
-			generateInnerApi(innerApi),
-			generateOuterApi(outerApi),
-			generateOuterApiImpl(outerApi),
-			generateApiAdapter(innerApi, outerApi),
-			generateApiConnection(innerApi, loggers)
-		)
+		files.add(generateInnerApi(innerApi))
+		files.add(generateOuterApi(outerApi))
+		files.add(generateOuterApiImpl(outerApi))
+		files.add(generateApiAdapter(innerApi, outerApi))
+		files.add(generateApiConnection(innerApi, loggers))
 		
 		outerApi.services.sortedBy(Service::id).mapTo(files) { generateOuterApiService(it.descriptor, loggers) }
 		
 		if (loggers.hasNext()) {
 			files.add(generateLogging(loggers))
 		}
-		
-		files.forEach { it.write(targetSrc) }
 	}
 	
 	protected abstract fun generateApiAdapterDeclaration(code: CodeBlock, iaName: String, oaName: String): CodeBlock

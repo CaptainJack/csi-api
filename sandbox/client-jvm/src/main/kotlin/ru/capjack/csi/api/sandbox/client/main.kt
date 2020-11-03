@@ -14,7 +14,7 @@ import ru.capjack.csi.transport.netty.common.factoryEventLoopGroup
 import ru.capjack.tool.io.ArrayByteBuffer
 import ru.capjack.tool.io.ByteBuffer
 import ru.capjack.tool.logging.Logging
-import ru.capjack.tool.utils.assistant.ExecutorDelayableAssistant
+import ru.capjack.tool.utils.assistant.ExecutorTemporalAssistant
 import ru.capjack.tool.utils.pool.ArrayObjectPool
 import ru.capjack.tool.utils.pool.ObjectAllocator
 import ru.capjack.tool.utils.pool.ObjectPool
@@ -30,7 +30,7 @@ fun main() {
 	val assistantExecutor = Executors.newScheduledThreadPool(processors)
 	val elg = factoryEventLoopGroup(processors, true)
 	
-	val assistant = ExecutorDelayableAssistant(assistantExecutor)
+	val assistant = ExecutorTemporalAssistant(assistantExecutor)
 	
 	val byteBuffers: ObjectPool<ByteBuffer> = ArrayObjectPool(100, object : ObjectAllocator<ByteBuffer> {
 		override fun produceInstance(): ByteBuffer = ArrayByteBuffer()
@@ -71,7 +71,7 @@ class SbApiSluice : ApiSluice<InternalClientApi, InternalServerApi> {
 	
 }
 
-class SbClientApi(private val server: InternalServerApi) : InternalClientApi, ConnectionRecoveryHandler {
+class SbClientApi(server: InternalServerApi) : InternalClientApi, ConnectionRecoveryHandler {
 	
 	private lateinit var sessionUser: SessionUser
 	

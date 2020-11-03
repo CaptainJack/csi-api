@@ -50,24 +50,40 @@ fun StringBuilder.logS(arg: String, value: IntArray) = logPrefix(arg).log(value)
 fun StringBuilder.logS(arg: String, value: DoubleArray) = logPrefix(arg).log(value).append(SEP)
 fun StringBuilder.logS(arg: String, value: LongArray) = logPrefix(arg).log(value).append(SEP)
 
+fun <T> StringBuilder.log(arg: String, value: Array<T>, log: StringBuilder.(T) -> Unit) = logPrefix(arg).log(value, log)
+fun <T> StringBuilder.logS(arg: String, value: Array<T>, log: StringBuilder.(T) -> Unit) = log(arg, value, log).append(SEP)
+
 fun <T> StringBuilder.log(arg: String, value: List<T>, log: StringBuilder.(T) -> Unit) = logPrefix(arg).log(value, log)
 fun <T> StringBuilder.logS(arg: String, value: List<T>, log: StringBuilder.(T) -> Unit) = log(arg, value, log).append(SEP)
 
-fun <T> StringBuilder.log(value: List<T>, log: StringBuilder.(T) -> Unit): StringBuilder {
+fun <T> StringBuilder.log(value: Array<T>, log: StringBuilder.(T) -> Unit): StringBuilder {
 	append('[')
-	value.forEachIndexed { i, e ->
-		if (i != 0) append(SEP)
-		log(e)
+	var s = false
+	value.forEach {
+		if (s) append(SEP) else s = true
+		log(it)
 	}
 	append(']')
 	return this
 }
+
+fun <T> StringBuilder.log(value: List<T>, log: StringBuilder.(T) -> Unit): StringBuilder {
+	append('[')
+	var s = false
+	value.forEach {
+		if (s) append(SEP) else s = true
+		log(it)
+	}
+	append(']')
+	return this
+}
+
 fun <T> StringBuilder.logS(value: List<T>, log: StringBuilder.(T) -> Unit) = log(value, log).append(SEP)
 
 fun <T> StringBuilder.log(arg: String, value: T, log: StringBuilder.(T) -> Unit) = logPrefix(arg).log(value, log)
 fun <T> StringBuilder.logS(arg: String, value: T, log: StringBuilder.(T) -> Unit) = log(arg, value, log).append(SEP)
 
-fun <T> StringBuilder.log(value: T, log: StringBuilder.(T) -> Unit) = apply {  log(value)}
+fun <T> StringBuilder.log(value: T, log: StringBuilder.(T) -> Unit) = apply { log(value) }
 fun <T> StringBuilder.logS(value: T, log: StringBuilder.(T) -> Unit) = log(value, log).append(SEP)
 
 
