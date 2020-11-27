@@ -8,5 +8,5 @@ dependencies {
 	
 	implementation("ru.capjack.tool:tool-utils")
 	implementation("org.yaml:snakeyaml:1.25")
-	api("ru.capjack.tool:tool-io-biser-generator")
+	api("ru.capjack.tool:tool-biser-generator")
 }

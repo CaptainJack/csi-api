@@ -5,17 +5,17 @@ import ru.capjack.csi.api.generator.model.ApiModel
 import ru.capjack.csi.api.generator.model.Method
 import ru.capjack.csi.api.generator.model.Service
 import ru.capjack.csi.api.generator.model.ServiceDescriptor
-import ru.capjack.tool.io.biser.generator.CodeBlock
-import ru.capjack.tool.io.biser.generator.CodeFile
-import ru.capjack.tool.io.biser.generator.CodePath
-import ru.capjack.tool.io.biser.generator.CoderNameScopeVisitor
-import ru.capjack.tool.io.biser.generator.ImportsCollection
-import ru.capjack.tool.io.biser.generator.TypeAggregator
-import ru.capjack.tool.io.biser.generator.TypeCollector
-import ru.capjack.tool.io.biser.generator.kotlin.KotlinCoderNameVisitor
-import ru.capjack.tool.io.biser.generator.kotlin.KotlinCodersGenerator
-import ru.capjack.tool.io.biser.generator.kotlin.KotlinFile
-import ru.capjack.tool.io.biser.generator.model.*
+import ru.capjack.tool.biser.generator.CodeBlock
+import ru.capjack.tool.biser.generator.CodeFile
+import ru.capjack.tool.biser.generator.CodePath
+import ru.capjack.tool.biser.generator.CoderNameScopeVisitor
+import ru.capjack.tool.biser.generator.ImportsCollection
+import ru.capjack.tool.biser.generator.TypeAggregator
+import ru.capjack.tool.biser.generator.TypeCollector
+import ru.capjack.tool.biser.generator.kotlin.KotlinCoderNameVisitor
+import ru.capjack.tool.biser.generator.kotlin.KotlinCodersGenerator
+import ru.capjack.tool.biser.generator.kotlin.KotlinFile
+import ru.capjack.tool.biser.generator.model.*
 import java.nio.file.Path
 
 abstract class KotlinApiGenerator(
@@ -392,7 +392,7 @@ abstract class KotlinApiGenerator(
 			addImport("ru.capjack.csi.api.ApiMessagePool")
 			addImport("ru.capjack.csi.api.$side.AbstractApiConnection")
 			addImport("ru.capjack.csi.core.Connection")
-			addImport("ru.capjack.tool.io.biser.BiserReader")
+			addImport("ru.capjack.tool.biser.BiserReader")
 			addImport("ru.capjack.tool.logging.Logger")
 			
 			line("internal class ApiConnection(")

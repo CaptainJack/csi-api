@@ -1,7 +1,7 @@
 package ru.capjack.csi.api.sandbox.server
 
-import ru.capjack.csi.api.sandbox.api.SessionUser
-import ru.capjack.csi.api.sandbox.api.User
+import ru.capjack.csi.api.sandbox.api.data.SessionUser
+import ru.capjack.csi.api.sandbox.api.data.User
 import ru.capjack.csi.api.sandbox.api.server.ApiAdapter
 import ru.capjack.csi.api.sandbox.api.server.FriendsService
 import ru.capjack.csi.api.sandbox.api.server.InternalClientApi
@@ -14,7 +14,6 @@ import ru.capjack.csi.transport.netty.server.ServerEventLoopGroupsImpl
 import ru.capjack.csi.transport.netty.server.WebSocketChannelGate
 import ru.capjack.tool.io.ArrayByteBuffer
 import ru.capjack.tool.io.ByteBuffer
-import ru.capjack.tool.io.InputByteBuffer
 import ru.capjack.tool.io.getInt
 import ru.capjack.tool.logging.Logging
 import ru.capjack.tool.utils.assistant.ExecutorTemporalAssistant

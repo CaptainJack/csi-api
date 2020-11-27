@@ -1,8 +1,8 @@
 package ru.capjack.csi.api.generator.model
 
-import ru.capjack.tool.io.biser.generator.CodePath
-import ru.capjack.tool.io.biser.generator.model.Change
-import ru.capjack.tool.io.biser.generator.model.Type
+import ru.capjack.tool.biser.generator.CodePath
+import ru.capjack.tool.biser.generator.model.Change
+import ru.capjack.tool.biser.generator.model.Type
 
 interface Api {
 	fun updatePath(value: String): Change

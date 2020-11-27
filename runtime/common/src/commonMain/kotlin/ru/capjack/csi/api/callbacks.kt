@@ -1,6 +1,6 @@
 package ru.capjack.csi.api
 
-import ru.capjack.tool.io.biser.BiserReader
+import ru.capjack.tool.biser.BiserReader
 
 typealias Callback<T> = (T) -> Unit
 

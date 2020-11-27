@@ -1,36 +1,31 @@
 package ru.capjack.csi.api.sandbox.client
 
+import kotlinx.browser.window
 import ru.capjack.csi.api.client.ApiSluice
-import ru.capjack.csi.api.sandbox.api.data.SessionUser
 import ru.capjack.csi.api.sandbox.api.client.ApiAdapter
 import ru.capjack.csi.api.sandbox.api.client.InternalClientApi
 import ru.capjack.csi.api.sandbox.api.client.InternalServerApi
 import ru.capjack.csi.api.sandbox.api.client.SessionService
+import ru.capjack.csi.api.sandbox.api.data.SessionUser
+import ru.capjack.csi.api.sandbox.api.data.User
 import ru.capjack.csi.core.client.Client
 import ru.capjack.csi.core.client.ConnectFailReason
 import ru.capjack.csi.core.client.ConnectionRecoveryHandler
-import ru.capjack.csi.transport.netty.client.WebSocketChannelGate
-import ru.capjack.csi.transport.netty.common.factoryEventLoopGroup
+import ru.capjack.csi.transport.js.client.browser.WebSocketChannelGate
 import ru.capjack.tool.io.ArrayByteBuffer
 import ru.capjack.tool.io.ByteBuffer
 import ru.capjack.tool.logging.Logging
-import ru.capjack.tool.utils.assistant.ExecutorTemporalAssistant
+import ru.capjack.tool.utils.ErrorCatcher
+import ru.capjack.tool.utils.InstantTime
+import ru.capjack.tool.utils.assistant.WgsTemporalAssistant
 import ru.capjack.tool.utils.pool.ArrayObjectPool
 import ru.capjack.tool.utils.pool.ObjectAllocator
 import ru.capjack.tool.utils.pool.ObjectPool
-import java.net.URI
-import java.util.concurrent.Executors
-import java.util.concurrent.TimeUnit
 
-fun main() {
+@ExperimentalJsExport
+@JsExport
+fun main(sluice: ApiSluice<InternalClientApi, InternalServerApi>) {
 	val logger = Logging.getLogger("sandbox")
-	logger.info("Start")
-	
-	val processors = Runtime.getRuntime().availableProcessors()
-	val assistantExecutor = Executors.newScheduledThreadPool(processors)
-	val elg = factoryEventLoopGroup(processors, true)
-	
-	val assistant = ExecutorTemporalAssistant(assistantExecutor)
 	
 	val byteBuffers: ObjectPool<ByteBuffer> = ArrayObjectPool(100, object : ObjectAllocator<ByteBuffer> {
 		override fun produceInstance(): ByteBuffer = ArrayByteBuffer()
@@ -38,27 +33,22 @@ fun main() {
 		override fun disposeInstance(instance: ByteBuffer): Unit = instance.clear()
 	})
 	
-	val gate = WebSocketChannelGate(elg, URI("ws://localhost:7777"))
-	val client = Client(assistant, byteBuffers, gate, version = 1, activityTimeoutSeconds = 10)
+	val assistant = WgsTemporalAssistant(
+		object : ErrorCatcher {
+			override fun catchError(error: dynamic) = logger.error("WGS Error: $error")
+		},
+		window.performance.unsafeCast<InstantTime>(),
+		window
+	)
 	
-	val adapter = ApiAdapter(SbApiSluice(), byteBuffers)
-	
-	Runtime.getRuntime().addShutdownHook(Thread {
-		logger.info("Stop elg")
-		elg.shutdownGracefully().syncUninterruptibly()
-		
-		logger.info("Stop assistant")
-		assistantExecutor.shutdown()
-		if (!assistantExecutor.awaitTermination(1, TimeUnit.MINUTES)) {
-			logger.warn("Assistant not stopped")
-		}
-		
-		logger.info("Stopped")
-	})
+	val gate = WebSocketChannelGate("ws://localhost:7777")
+	val client = Client(assistant, byteBuffers, gate, 1, 10)
+	val adapter = ApiAdapter(sluice, byteBuffers)
 	
 	client.connect(byteArrayOf(0, 0, 0, 1), adapter)
 }
 
+@ExperimentalJsExport
 class SbApiSluice : ApiSluice<InternalClientApi, InternalServerApi> {
 	override fun connect(server: InternalServerApi): InternalClientApi {
 		println("connect")
@@ -71,6 +61,7 @@ class SbApiSluice : ApiSluice<InternalClientApi, InternalServerApi> {
 	
 }
 
+@ExperimentalJsExport
 class SbClientApi(server: InternalServerApi) : InternalClientApi, ConnectionRecoveryHandler {
 	
 	private lateinit var sessionUser: SessionUser

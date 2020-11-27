@@ -1,8 +1,8 @@
 package ru.capjack.csi.api.generator.model
 
 import ru.capjack.csi.api.generator.kotlin.ApiKotlinModelLoader
-import ru.capjack.tool.io.biser.generator.CodePath
-import ru.capjack.tool.io.biser.generator.kotlin.KotlinSource
+import ru.capjack.tool.biser.generator.CodePath
+import ru.capjack.tool.biser.generator.kotlin.KotlinSource
 import java.nio.file.Files
 import java.nio.file.Path
 

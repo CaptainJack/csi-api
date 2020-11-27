@@ -2,7 +2,7 @@ package ru.capjack.csi.api
 
 import ru.capjack.tool.io.ByteBuffer
 import ru.capjack.tool.io.DummyByteBuffer
-import ru.capjack.tool.io.biser.ByteBufferBiserWriter
+import ru.capjack.tool.biser.ByteBufferBiserWriter
 
 internal class OutputApiMessageImpl(
 	override var buffer: ByteBuffer

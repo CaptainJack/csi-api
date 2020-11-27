@@ -1,10 +1,10 @@
 package ru.capjack.csi.api.generator.kotlin
 
 import ru.capjack.csi.api.generator.model.ApiModel
-import ru.capjack.tool.io.biser.generator.CodeBlock
-import ru.capjack.tool.io.biser.generator.CodeFile
-import ru.capjack.tool.io.biser.generator.CodePath
-import ru.capjack.tool.io.biser.generator.kotlin.KotlinCodersGenerator
+import ru.capjack.tool.biser.generator.CodeBlock
+import ru.capjack.tool.biser.generator.CodeFile
+import ru.capjack.tool.biser.generator.CodePath
+import ru.capjack.tool.biser.generator.kotlin.KotlinCodersGenerator
 import java.nio.file.Path
 
 open class ClientKotlinApiGenerator(

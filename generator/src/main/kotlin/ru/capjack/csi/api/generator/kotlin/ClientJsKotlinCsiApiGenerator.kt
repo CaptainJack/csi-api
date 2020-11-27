@@ -1,17 +1,17 @@
 package ru.capjack.csi.api.generator.kotlin
 
-import ru.capjack.tool.io.biser.generator.CodePath
-import ru.capjack.tool.io.biser.generator.ImportsCollection
-import ru.capjack.tool.io.biser.generator.kotlin.DefaultKotlinGearFactory
-import ru.capjack.tool.io.biser.generator.kotlin.KotlinCodersGenerator
-import ru.capjack.tool.io.biser.generator.kotlin.KotlinReadCallVisitor
-import ru.capjack.tool.io.biser.generator.kotlin.KotlinTypeNameVisitor
-import ru.capjack.tool.io.biser.generator.kotlin.KotlinWriteCallVisitor
-import ru.capjack.tool.io.biser.generator.model.EnumDescriptor
-import ru.capjack.tool.io.biser.generator.model.ListType
-import ru.capjack.tool.io.biser.generator.model.PrimitiveType
-import ru.capjack.tool.io.biser.generator.model.StructureType
-import ru.capjack.tool.io.biser.generator.model.TypeVisitor
+import ru.capjack.tool.biser.generator.CodePath
+import ru.capjack.tool.biser.generator.ImportsCollection
+import ru.capjack.tool.biser.generator.kotlin.DefaultKotlinGearFactory
+import ru.capjack.tool.biser.generator.kotlin.KotlinCodersGenerator
+import ru.capjack.tool.biser.generator.kotlin.KotlinReadCallVisitor
+import ru.capjack.tool.biser.generator.kotlin.KotlinTypeNameVisitor
+import ru.capjack.tool.biser.generator.kotlin.KotlinWriteCallVisitor
+import ru.capjack.tool.biser.generator.model.EnumDescriptor
+import ru.capjack.tool.biser.generator.model.ListType
+import ru.capjack.tool.biser.generator.model.PrimitiveType
+import ru.capjack.tool.biser.generator.model.StructureType
+import ru.capjack.tool.biser.generator.model.TypeVisitor
 
 class ClientJsKotlinCsiApiGenerator(module: String) : KotlinCsiApiGenerator(CodePath(module)) {
 	override fun createApiGenerator(sourcePackage: CodePath, codersGenerator: KotlinCodersGenerator): KotlinApiGenerator {

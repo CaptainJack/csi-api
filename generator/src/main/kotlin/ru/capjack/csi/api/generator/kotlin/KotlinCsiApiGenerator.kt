@@ -2,8 +2,8 @@ package ru.capjack.csi.api.generator.kotlin
 
 import ru.capjack.csi.api.generator.CsiApiGenerator
 import ru.capjack.csi.api.generator.model.ApiModel
-import ru.capjack.tool.io.biser.generator.CodePath
-import ru.capjack.tool.io.biser.generator.kotlin.KotlinCodersGenerator
+import ru.capjack.tool.biser.generator.CodePath
+import ru.capjack.tool.biser.generator.kotlin.KotlinCodersGenerator
 import java.nio.file.Path
 
 abstract class KotlinCsiApiGenerator(protected val sourcePackage: CodePath) : CsiApiGenerator {

@@ -1,7 +1,7 @@
 package ru.capjack.csi.api.generator.model
 
-import ru.capjack.tool.io.biser.generator.CodePath
-import ru.capjack.tool.io.biser.generator.model.Change
+import ru.capjack.tool.biser.generator.CodePath
+import ru.capjack.tool.biser.generator.model.Change
 import ru.capjack.tool.utils.collections.mutableKeyedSetOf
 import java.util.*
 

@@ -1,6 +1,6 @@
 package ru.capjack.csi.api
 
-import ru.capjack.tool.io.biser.BiserReader
+import ru.capjack.tool.biser.BiserReader
 
 actual class RealCallbacksRegister : CallbacksRegister {
 	private var nextId = 0

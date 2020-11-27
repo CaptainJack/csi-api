@@ -6,14 +6,18 @@ include(
 	"runtime:server",
 	
 	"generator",
-	"gradle-plugin",
-	
+	"gradle-plugin"
+	/*
+	,
 	"sandbox:api",
 	"sandbox:api:client",
+	"sandbox:api:client-js",
 	"sandbox:api:server",
 	"sandbox:api-generator",
-	"sandbox:server-jvm",
-	"sandbox:client-jvm"
+	
+	"sandbox:client-js",
+	"sandbox:client-jvm",
+	"sandbox:server-jvm"*/
 )
 
 arrayOf("common", "client", "server").forEach {

@@ -3,19 +3,19 @@ package ru.capjack.csi.api.generator.kotlin
 import ru.capjack.csi.api.generator.model.Api
 import ru.capjack.csi.api.generator.model.ApiModel
 import ru.capjack.csi.api.generator.model.ServiceDescriptor
-import ru.capjack.tool.io.biser.generator.CodeBlock
-import ru.capjack.tool.io.biser.generator.CodeFile
-import ru.capjack.tool.io.biser.generator.CodePath
-import ru.capjack.tool.io.biser.generator.ImportsCollection
-import ru.capjack.tool.io.biser.generator.kotlin.KotlinCodersGenerator
-import ru.capjack.tool.io.biser.generator.kotlin.KotlinFile
-import ru.capjack.tool.io.biser.generator.model.EntityDescriptor
-import ru.capjack.tool.io.biser.generator.model.EnumDescriptor
-import ru.capjack.tool.io.biser.generator.model.ObjectDescriptor
-import ru.capjack.tool.io.biser.generator.model.StructureDescriptor
-import ru.capjack.tool.io.biser.generator.model.StructureDescriptorVisitor
-import ru.capjack.tool.io.biser.generator.model.StructureType
-import ru.capjack.tool.io.biser.generator.model.Type
+import ru.capjack.tool.biser.generator.CodeBlock
+import ru.capjack.tool.biser.generator.CodeFile
+import ru.capjack.tool.biser.generator.CodePath
+import ru.capjack.tool.biser.generator.ImportsCollection
+import ru.capjack.tool.biser.generator.kotlin.KotlinCodersGenerator
+import ru.capjack.tool.biser.generator.kotlin.KotlinFile
+import ru.capjack.tool.biser.generator.model.EntityDescriptor
+import ru.capjack.tool.biser.generator.model.EnumDescriptor
+import ru.capjack.tool.biser.generator.model.ObjectDescriptor
+import ru.capjack.tool.biser.generator.model.StructureDescriptor
+import ru.capjack.tool.biser.generator.model.StructureDescriptorVisitor
+import ru.capjack.tool.biser.generator.model.StructureType
+import ru.capjack.tool.biser.generator.model.Type
 import java.nio.file.Path
 
 class TsFile(private val name: String) : CodeFile() {

@@ -4,8 +4,8 @@ import ru.capjack.csi.core.BaseConnectionHandler
 import ru.capjack.csi.core.Connection
 import ru.capjack.csi.core.ProtocolBrokenException
 import ru.capjack.tool.io.InputByteBuffer
-import ru.capjack.tool.io.biser.BiserReader
-import ru.capjack.tool.io.biser.BiserWriter
+import ru.capjack.tool.biser.BiserReader
+import ru.capjack.tool.biser.BiserWriter
 import ru.capjack.tool.logging.Logger
 import ru.capjack.tool.logging.debug
 import ru.capjack.tool.logging.error

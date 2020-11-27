@@ -12,10 +12,10 @@ import ru.capjack.csi.api.generator.model.Api
 import ru.capjack.csi.api.generator.model.ApiModel
 import ru.capjack.csi.api.generator.model.Parameter
 import ru.capjack.csi.api.generator.model.ServiceDescriptor
-import ru.capjack.tool.io.biser.generator.GeneratorException
-import ru.capjack.tool.io.biser.generator.kotlin.KotlinModelLoader
-import ru.capjack.tool.io.biser.generator.kotlin.KotlinSource
-import ru.capjack.tool.io.biser.generator.model.Change
+import ru.capjack.tool.biser.generator.GeneratorException
+import ru.capjack.tool.biser.generator.kotlin.KotlinModelLoader
+import ru.capjack.tool.biser.generator.kotlin.KotlinSource
+import ru.capjack.tool.biser.generator.model.Change
 
 class ApiKotlinModelLoader(
 	model: ApiModel,

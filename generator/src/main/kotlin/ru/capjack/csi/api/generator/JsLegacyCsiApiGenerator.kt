@@ -1,16 +1,16 @@
 package ru.capjack.csi.api.generator
 
 import ru.capjack.csi.api.generator.model.ApiModel
-import ru.capjack.tool.io.biser.generator.CodeFile
-import ru.capjack.tool.io.biser.generator.model.EntityDescriptor
-import ru.capjack.tool.io.biser.generator.model.EnumDescriptor
-import ru.capjack.tool.io.biser.generator.model.ListType
-import ru.capjack.tool.io.biser.generator.model.NullableType
-import ru.capjack.tool.io.biser.generator.model.ObjectDescriptor
-import ru.capjack.tool.io.biser.generator.model.PrimitiveType
-import ru.capjack.tool.io.biser.generator.model.StructureDescriptor
-import ru.capjack.tool.io.biser.generator.model.StructureType
-import ru.capjack.tool.io.biser.generator.model.TypeVisitor
+import ru.capjack.tool.biser.generator.CodeFile
+import ru.capjack.tool.biser.generator.model.EntityDescriptor
+import ru.capjack.tool.biser.generator.model.EnumDescriptor
+import ru.capjack.tool.biser.generator.model.ListType
+import ru.capjack.tool.biser.generator.model.NullableType
+import ru.capjack.tool.biser.generator.model.ObjectDescriptor
+import ru.capjack.tool.biser.generator.model.PrimitiveType
+import ru.capjack.tool.biser.generator.model.StructureDescriptor
+import ru.capjack.tool.biser.generator.model.StructureType
+import ru.capjack.tool.biser.generator.model.TypeVisitor
 import java.nio.file.Files
 import java.nio.file.Path
 
@@ -170,7 +170,7 @@ class JsLegacyCsiApiGenerator : CsiApiGenerator {
 			
 			return when (val elementType = type.element) {
 				is StructureType -> result + "readObjectArray()"
-				is PrimitiveType -> {
+				is PrimitiveType -> result + {
 					when (elementType) {
 						PrimitiveType.BOOLEAN -> "readRawArray(DataTypes.BOOLEAN)"
 						PrimitiveType.BYTE    -> "readRawArray(DataTypes.BYTE)"

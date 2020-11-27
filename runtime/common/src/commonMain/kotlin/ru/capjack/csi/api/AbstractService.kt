@@ -2,8 +2,8 @@ package ru.capjack.csi.api
 
 import ru.capjack.csi.core.Connection
 import ru.capjack.tool.io.InputByteBuffer
-import ru.capjack.tool.io.biser.BiserReader
-import ru.capjack.tool.io.biser.BiserWriter
+import ru.capjack.tool.biser.BiserReader
+import ru.capjack.tool.biser.BiserWriter
 import ru.capjack.tool.logging.Logger
 import ru.capjack.tool.utils.pool.ObjectPool
 import ru.capjack.tool.utils.pool.use

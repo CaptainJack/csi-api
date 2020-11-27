@@ -1,6 +1,6 @@
 package ru.capjack.csi.api
 
-import ru.capjack.tool.io.biser.BiserReader
+import ru.capjack.tool.biser.BiserReader
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicInteger
 
