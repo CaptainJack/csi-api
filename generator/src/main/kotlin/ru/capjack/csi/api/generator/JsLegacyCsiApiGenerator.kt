@@ -170,8 +170,8 @@ class JsLegacyCsiApiGenerator : CsiApiGenerator {
 			
 			return when (val elementType = type.element) {
 				is StructureType -> result + "readObjectArray()"
-				is PrimitiveType -> result + {
-					when (elementType) {
+				is PrimitiveType -> {
+					result + when (elementType) {
 						PrimitiveType.BOOLEAN -> "readRawArray(DataTypes.BOOLEAN)"
 						PrimitiveType.BYTE    -> "readRawArray(DataTypes.BYTE)"
 						PrimitiveType.INT     -> "readRawArray(DataTypes.INTEGER)"
