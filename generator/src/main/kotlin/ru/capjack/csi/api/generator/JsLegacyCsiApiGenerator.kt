@@ -254,7 +254,7 @@ class JsLegacyCsiApiGenerator : CsiApiGenerator {
 				}
 				else desc.fields
 				
-				fields.map { it.type }.forEach {
+				fields.map { it.type }.distinct().forEach {
 					if (it is StructureType) {
 						val n = it.tsName()
 						if (it.descriptor is EnumDescriptor) {

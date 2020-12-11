@@ -12,9 +12,9 @@ plugins {
 depver {
 	"ru.capjack.tool" {
 		"tool-lang"("1.7.0")
-		"tool-utils"("1.1.1")
+		"tool-utils"("1.2.0")
 		"tool-logging"("1.2.2")
-		"tool-biser*"("0.8.0")
+		"tool-biser*"("0.8.1")
 	}
 	"ru.capjack.csi" {
 		"csi-core-*"("0.6.0")
