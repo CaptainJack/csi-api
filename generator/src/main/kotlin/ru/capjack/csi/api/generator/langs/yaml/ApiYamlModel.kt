@@ -4,7 +4,7 @@ import ru.capjack.csi.api.generator.ApiVersion
 import ru.capjack.tool.biser.generator.langs.yaml.YamlModel
 
 class ApiYamlModel : YamlModel() {
-	var version = ApiVersion(0, 0)
+	var version = ApiVersion()
 	
 	val client: Api = Api()
 	val server: Api = Api()

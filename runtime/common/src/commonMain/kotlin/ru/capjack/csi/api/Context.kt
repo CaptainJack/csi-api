@@ -10,7 +10,8 @@ class Context(
 	val messagePool: ApiMessagePool,
 	val connection: Connection,
 	val callbacks: CallbacksRegister,
-	val innerInstanceServices: InnerServiceHolder,
-	val innerSubscriptions: InnerSubscriptionHolder,
-	val outerSubscriptions: OuterSubscriptionHolder
-)
+) {
+	val innerInstanceServices = InnerServiceHolder()
+	val innerSubscriptions = InnerSubscriptionHolder()
+	val outerSubscriptions = OuterSubscriptionHolder(logger)
+}

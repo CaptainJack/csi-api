@@ -28,10 +28,7 @@ abstract class BaseApiAdapter<IA : BaseInnerApi, OA : OuterApi, CH : BaseConnect
 			coroutineScope,
 			messagePool,
 			connection,
-			provideCallbacksRegister(),
-			InnerServiceHolder(),
-			InnerSubscriptionHolder(),
-			OuterSubscriptionHolder()
+			provideCallbacksRegister()
 		)
 	}
 }

@@ -1,8 +1,9 @@
 package ru.capjack.csi.api
 
+import ru.capjack.tool.logging.Logger
 import ru.capjack.tool.utils.Cancelable
 
-class OuterSubscriptionHolder {
+class OuterSubscriptionHolder(private val logger: Logger) {
 	private val map = ConcurrentHashMap<Int, OuterSubscription>()
 	private val nextId = AtomicInteger()
 	
@@ -18,7 +19,16 @@ class OuterSubscriptionHolder {
 	
 	fun cancel(id: Int): Boolean {
 		return null != map.remove(id)?.also {
-			it.cancel()
+			try {
+				it.cancel()
+			}
+			catch (e: Throwable) {
+				logger.error("Uncaught exception", e)
+			}
 		}
+	}
+	
+	fun cancelAll() {
+		map.keys.toList().forEach(::cancel)
 	}
 }

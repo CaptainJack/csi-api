@@ -69,7 +69,7 @@ abstract class KotlinApiGenerator(
 	}
 	
 	private fun generateApiVersion(): KotlinCodeFile {
-		return KotlinCodeFile(sidePackage.resolveEntityName("_version")).apply {
+		return KotlinCodeFile(targetPackage.resolveEntityName("_version")).apply {
 			body.line("const val API_VERSION = ${model.version.compatible}")
 		}
 	}

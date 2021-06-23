@@ -20,6 +20,11 @@ abstract class InnerServiceDelegate<S : Any>(
 		name += "[+$id]"
 	}
 	
+	fun closeConnectionDueError(e: Throwable) {
+		context.logger.error("Uncaught exception", e)
+		context.connection.closeDueError()
+	}
+	
 	protected fun <S : Any> registerInstanceService(instance: ServiceInstance<S>, delegate: InnerServiceDelegate<S>): Int {
 		return context.innerInstanceServices.add(InnerServiceHolderItem(instance, delegate))
 	}
@@ -28,8 +33,15 @@ abstract class InnerServiceDelegate<S : Any>(
 		return context.outerSubscriptions.add(subscription, cancelable)
 	}
 	
-	protected fun launchCoroutine(block: suspend CoroutineScope.() -> Unit) {
-		context.coroutineScope.launch(block = block)
+	protected inline fun launchCoroutine(crossinline block: suspend CoroutineScope.() -> Unit) {
+		context.coroutineScope.launch {
+			try {
+				block()
+			}
+			catch (e: Throwable) {
+				closeConnectionDueError(e)
+			}
+		}
 	}
 	
 	protected inline fun sendMethodResponse(callback: Int, data: BiserWriter.() -> Unit) {
@@ -103,7 +115,7 @@ abstract class InnerServiceDelegate<S : Any>(
 				.toString()
 		}
 	}
-
+	
 	protected fun prepareLogMethodCall(method: String): StringBuilder {
 		return StringBuilder()
 			.append("<- ")

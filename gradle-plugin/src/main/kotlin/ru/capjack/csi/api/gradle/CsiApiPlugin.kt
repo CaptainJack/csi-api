@@ -9,7 +9,9 @@ open class CsiApiPlugin : Plugin<Project> {
 		project.pluginManager.apply("org.jetbrains.kotlin.multiplatform")
 		
 		project.kmp {
-			jvm()
+			jvm {
+				compilations.all { kotlinOptions.jvmTarget = "11" }
+			}
 			sourceSets.getByName("commonMain") {
 				dependencies {
 					implementation("ru.capjack.csi:csi-api-common")

@@ -136,7 +136,7 @@ abstract class OuterService(
 		if (!_closed) {
 			_closed = true
 			
-			_subscriptions.cancel()
+			_subscriptions.cancelAll()
 			
 			_context.logger.debug {
 				"-> $_name [close]"

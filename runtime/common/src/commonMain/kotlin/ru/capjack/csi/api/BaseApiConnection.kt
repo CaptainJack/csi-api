@@ -2,11 +2,9 @@ package ru.capjack.csi.api
 
 import ru.capjack.csi.core.BaseConnectionHandler
 import ru.capjack.csi.core.ProtocolBrokenException
-import ru.capjack.tool.biser.BiserReader
 import ru.capjack.tool.io.InputByteBuffer
 import ru.capjack.tool.lang.alsoFalse
 import ru.capjack.tool.logging.debug
-import ru.capjack.tool.logging.error
 import ru.capjack.tool.utils.pool.use
 
 abstract class BaseApiConnection<IA : BaseInnerApi>(
@@ -78,6 +76,11 @@ abstract class BaseApiConnection<IA : BaseInnerApi>(
 	
 	override fun handleConnectionClose() {
 		context.logger.debug { "Close" }
+		
+		context.outerSubscriptions.cancelAll()
+		context.innerSubscriptions.cancelAll()
+		context.innerInstanceServices.closeAll()
+		
 		try {
 			api.handleConnectionClose()
 		}

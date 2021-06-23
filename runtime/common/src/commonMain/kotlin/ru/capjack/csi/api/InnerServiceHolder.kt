@@ -24,5 +24,9 @@ class InnerServiceHolder {
 			}
 		}
 	}
+	
+	fun closeAll() {
+		map.keys.toList().forEach(::close)
+	}
 }
 

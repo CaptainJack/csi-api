@@ -35,7 +35,7 @@ abstract class KotlinApiTarget(
 	private fun Project.configureJvm() {
 		kmp {
 			jvm {
-				compilations.all { kotlinOptions.jvmTarget = "1.8" }
+				compilations.all { kotlinOptions.jvmTarget = "11" }
 			}
 		}
 	}

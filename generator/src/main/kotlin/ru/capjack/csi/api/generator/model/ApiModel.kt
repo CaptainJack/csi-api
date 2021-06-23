@@ -11,7 +11,7 @@ class ApiModel : DefaultModel() {
 	private val _client = ApiImpl("ClientApi")
 	private val _server = ApiImpl("ServerApi")
 	
-	val version = ApiVersion(0, 0)
+	val version = ApiVersion()
 	
 	val client: Api get() = _client
 	val server: Api get() = _server

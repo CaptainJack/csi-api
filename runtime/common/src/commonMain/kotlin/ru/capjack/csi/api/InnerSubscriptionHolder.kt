@@ -15,10 +15,8 @@ class InnerSubscriptionHolder {
 		map.remove(id)
 	}
 	
-	fun cancel() {
-		map.forEach {
-			it.value.cancel()
-		}
+	fun cancelAll() {
+		map.values.toList().forEach(InnerSubscription::cancel)
 	}
 }
 

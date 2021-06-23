@@ -14,7 +14,7 @@ depver {
 		"tool-biser-generator"("1.0.0")
 	}
 	"ru.capjack.csi" {
-		"csi-core-*"("1.0.0")
+		"csi-core-*"("1.1.0")
 		"csi-transport-*"("1.0.0")
 	}
 	"org.jetbrains.kotlinx:kotlinx-coroutines-core"("1.5.0")
