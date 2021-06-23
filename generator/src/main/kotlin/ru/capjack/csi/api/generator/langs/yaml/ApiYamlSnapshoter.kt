@@ -8,7 +8,8 @@ import ru.capjack.tool.biser.generator.langs.yaml.YamlSnapshoter
 class ApiYamlSnapshoter : YamlSnapshoter<ApiYamlModel, ApiModel>(ApiYamlModel::class) {
 	
 	override fun load(model: ApiModel, json: ApiYamlModel) {
-		super.load(model, json)
+		model.version.current = json.version.current
+		model.version.compatible = json.version.compatible
 		
 		loadApi(model, model.client, json.client)
 		loadApi(model, model.server, json.server)
@@ -38,6 +39,8 @@ class ApiYamlSnapshoter : YamlSnapshoter<ApiYamlModel, ApiModel>(ApiYamlModel::c
 			}
 			serviceDescriptor.commit(s.lastMethodId)
 		}
+		
+		super.load(model, json)
 	}
 	
 	private fun loadApi(model: ApiModel, api: Api, json: ApiYamlModel.Api) {
@@ -49,8 +52,6 @@ class ApiYamlSnapshoter : YamlSnapshoter<ApiYamlModel, ApiModel>(ApiYamlModel::c
 	}
 	
 	override fun save(model: ApiModel, json: ApiYamlModel) {
-		super.save(model, json)
-		
 		saveApi(model.client, json.client)
 		saveApi(model.server, json.server)
 		
@@ -85,6 +86,11 @@ class ApiYamlSnapshoter : YamlSnapshoter<ApiYamlModel, ApiModel>(ApiYamlModel::c
 				)
 			)
 		}
+		
+		json.version.current = model.version.current
+		json.version.compatible = model.version.compatible
+		
+		super.save(model, json)
 	}
 	
 	private fun saveApi(api: Api, json: ApiYamlModel.Api) {

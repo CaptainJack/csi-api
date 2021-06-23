@@ -1,5 +1,6 @@
 package ru.capjack.csi.api.generator.model
 
+import ru.capjack.csi.api.generator.ApiVersion
 import ru.capjack.tool.biser.generator.model.DefaultModel
 import ru.capjack.tool.biser.generator.model.EntityName
 import ru.capjack.tool.biser.generator.model.Model
@@ -9,6 +10,8 @@ import ru.capjack.tool.utils.collections.mutableKeyedSetOf
 class ApiModel : DefaultModel() {
 	private val _client = ApiImpl("ClientApi")
 	private val _server = ApiImpl("ServerApi")
+	
+	val version = ApiVersion(0, 0)
 	
 	val client: Api get() = _client
 	val server: Api get() = _server

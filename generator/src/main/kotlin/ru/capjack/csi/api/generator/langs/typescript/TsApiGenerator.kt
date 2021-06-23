@@ -12,6 +12,7 @@ import ru.capjack.tool.biser.generator.Code
 import ru.capjack.tool.biser.generator.DependedCode
 import ru.capjack.tool.biser.generator.TypeAggregator
 import ru.capjack.tool.biser.generator.TypeCollector
+import ru.capjack.tool.biser.generator.langs.kotlin.KotlinCodeFile
 import ru.capjack.tool.biser.generator.langs.typescript.TsCodeFile
 import ru.capjack.tool.biser.generator.langs.typescript.TsCodersGenerator
 import ru.capjack.tool.biser.generator.model.*
@@ -43,6 +44,7 @@ abstract class TsApiGenerator(
 	protected fun generate(innerApi: Api, outerApi: Api, files: MutableList<TsCodeFile>) {
 		val loggers = TypeAggregator()
 		
+		files.add(generateApiVersion())
 		files.add(generateInnerApi(innerApi))
 		files.add(generateOuterApi(outerApi))
 		files.add(generateOuterApiImpl(outerApi))
@@ -76,6 +78,12 @@ abstract class TsApiGenerator(
 			files.add(generateSourceApi(outerApi))
 			
 			allServices.mapTo(files) { generateSourceService(it) }
+		}
+	}
+	
+	private fun generateApiVersion(): TsCodeFile {
+		return TsCodeFile(implPackage.resolveEntityName("_version")).apply {
+			body.line("export const API_VERSION = ${model.version.compatible}")
 		}
 	}
 	

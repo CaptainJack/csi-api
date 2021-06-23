@@ -42,6 +42,7 @@ abstract class KotlinApiGenerator(
 	protected fun generate(innerApi: Api, outerApi: Api, files: MutableList<KotlinCodeFile>) {
 		val loggers = TypeAggregator()
 		
+		files.add(generateApiVersion())
 		files.add(generateInnerApi(innerApi))
 		files.add(generateOuterApi(outerApi))
 		files.add(generateOuterApiImpl(outerApi))
@@ -64,6 +65,12 @@ abstract class KotlinApiGenerator(
 		
 		if (loggers.hasNext()) {
 			files.add(generateLogging(loggers))
+		}
+	}
+	
+	private fun generateApiVersion(): KotlinCodeFile {
+		return KotlinCodeFile(sidePackage.resolveEntityName("_version")).apply {
+			body.line("const val API_VERSION = ${model.version.compatible}")
 		}
 	}
 	

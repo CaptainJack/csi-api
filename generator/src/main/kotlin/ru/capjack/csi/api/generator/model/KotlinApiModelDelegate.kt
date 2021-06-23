@@ -4,7 +4,7 @@ import ru.capjack.csi.api.generator.langs.kotlin.ApiKotlinModelLoader
 import ru.capjack.csi.api.generator.langs.yaml.ApiYamlSnapshoter
 import ru.capjack.tool.biser.generator.langs.kotlin.CommonKotlinSource
 import ru.capjack.tool.biser.generator.langs.kotlin.KotlinPackageFilter
-import ru.capjack.tool.biser.generator.langs.yaml.YamlModel
+import ru.capjack.tool.biser.generator.model.Model
 import java.nio.file.Files
 import java.nio.file.Path
 
@@ -34,5 +34,13 @@ class KotlinApiModelDelegate(val sourcePackage: String, sourcePath: Path, snapsh
 	private fun loadKotlin(sourcePath: Path) {
 		val source = CommonKotlinSource(sourcePath)
 		ApiKotlinModelLoader(source, model).load(KotlinPackageFilter(sourcePackage))
+		
+		if (model.mutation == Model.Mutation.COMPATIBLY) {
+			model.version.current++
+		}
+		else if (model.mutation == Model.Mutation.FULL) {
+			model.version.current++
+			model.version.compatible = model.version.current
+		}
 	}
 }
