@@ -6,12 +6,10 @@ plugins {
 
 kotlin {
 	jvm()
-	js(IR) {
-		browser()
-	}
 	
 	sourceSets["commonMain"].dependencies {
-		implementation(project(":runtime:csi-api-common"))
+		api(project(":runtime:csi-api-common"))
+		api("ru.capjack.tool:tool-utils")
 	}
 }
 
@@ -21,6 +19,23 @@ subprojects {
 	configure<KotlinMultiplatformExtension> {
 		sourceSets["commonMain"].dependencies {
 			api(project(":sandbox:api"))
+			when (name) {
+				"client" -> kotlin {
+					api(project(":runtime:csi-api-client"))
+				}
+				"server" -> kotlin {
+					api(project(":runtime:csi-api-server"))
+				}
+			}
+		}
+	}
+	
+	when (name) {
+		"client" -> kotlin {
+			jvm()
+		}
+		"server" -> kotlin {
+			jvm()
 		}
 	}
 }

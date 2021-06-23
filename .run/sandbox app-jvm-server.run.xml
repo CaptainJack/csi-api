@@ -1,0 +1,9 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="sandbox app-jvm-server" type="JetRunConfigurationType">
+    <option name="MAIN_CLASS_NAME" value="ru.capjack.sandbox.csi.app.server.MainKt" />
+    <module name="csi-api.sandbox.app-jvm-server.main" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

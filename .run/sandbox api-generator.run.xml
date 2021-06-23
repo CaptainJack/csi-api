@@ -1,0 +1,9 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="sandbox api-generator" type="JetRunConfigurationType">
+    <option name="MAIN_CLASS_NAME" value="ru.capjack.sandbox.csi.api.MainKt" />
+    <module name="csi-api.sandbox.api-generator.main" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

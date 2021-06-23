@@ -12,7 +12,7 @@ open class GenerateCsiApiTask : DefaultTask() {
 		val apiModelDelegate = KotlinApiModelDelegate(
 			extension.sourcePackage,
 			project.kmpSourceDirCommonMain.toPath(),
-			extension.modelSnapshotFile.toPath()
+			extension.modelFile.toPath()
 		)
 		
 		extension.targets.forEach { it.generate(apiModelDelegate) }

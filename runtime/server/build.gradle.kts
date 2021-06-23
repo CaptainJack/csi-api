@@ -1,6 +1,6 @@
 plugins {
 	kotlin("multiplatform")
-	id("ru.capjack.bintray")
+	id("ru.capjack.publisher")
 }
 
 kotlin {

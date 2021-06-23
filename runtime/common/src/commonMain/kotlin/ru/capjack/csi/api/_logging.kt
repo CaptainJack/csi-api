@@ -78,6 +78,19 @@ fun <T> StringBuilder.log(value: List<T>, log: StringBuilder.(T) -> Unit): Strin
 	return this
 }
 
+fun <K, V> StringBuilder.log(value: Map<K, V>, logK: StringBuilder.(K) -> Unit, logV: StringBuilder.(V) -> Unit): StringBuilder {
+	append('[')
+	var s = false
+	value.forEach {
+		if (s) append(SEP) else s = true
+		logK(it.key)
+		append(COM)
+		logV(it.value)
+	}
+	append(']')
+	return this
+}
+
 fun <T> StringBuilder.logS(value: List<T>, log: StringBuilder.(T) -> Unit) = log(value, log).append(SEP)
 
 fun <T> StringBuilder.log(arg: String, value: T, log: StringBuilder.(T) -> Unit) = logPrefix(arg).log(value, log)
@@ -88,4 +101,5 @@ fun <T> StringBuilder.logS(value: T, log: StringBuilder.(T) -> Unit) = log(value
 
 
 private const val SEP = ", "
-private fun StringBuilder.logPrefix(arg: String) = append(arg).append(": ")
+private const val COM = ": "
+private fun StringBuilder.logPrefix(arg: String) = append(arg).append(COM)

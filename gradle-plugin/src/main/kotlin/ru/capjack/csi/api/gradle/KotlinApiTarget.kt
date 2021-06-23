@@ -1,9 +1,9 @@
 package ru.capjack.csi.api.gradle
 
 import org.gradle.api.Project
-import ru.capjack.csi.api.generator.kotlin.ClientJsKotlinCsiApiGenerator
-import ru.capjack.csi.api.generator.kotlin.ClientKotlinCsiApiGenerator
-import ru.capjack.csi.api.generator.kotlin.ServerKotlinCsiApiGenerator
+import ru.capjack.csi.api.generator.langs.kotlin.ClientKotlinCsiApiGenerator
+import ru.capjack.csi.api.generator.langs.kotlin.ServerKotlinCsiApiGenerator
+import ru.capjack.csi.api.generator.langs.typescript.ClientTsCsiApiGenerator
 import ru.capjack.csi.api.generator.model.KotlinApiModelDelegate
 
 abstract class KotlinApiTarget(
@@ -74,17 +74,9 @@ class ClientKotlinApiTarget(name: String, platforms: Set<KotlinPlatform>) : Kotl
 		ClientKotlinCsiApiGenerator(delegate.sourcePackage).generate(delegate.model, project.kmpSourceDirCommonMain.toPath())
 	}
 }
-class ClientJsKotlinApiTarget(name: String, private val module: String) : KotlinApiTarget(name, ApiSide.CLIENT, setOf(KotlinPlatform.JS), false) {
+
+class ClientTypescriptApiTarget(name: String) : ApiTarget(name) {
 	override fun generate(delegate: KotlinApiModelDelegate) {
-		ClientJsKotlinCsiApiGenerator(module).generate(delegate.model, project.kmpSourceDir("jsMain").toPath())
-	}
-	
-	override fun configureProject(sourceProject: Project) {
-		super.configureProject(sourceProject)
-		project.kmp {
-			js(IR) {
-				binaries.executable()
-			}
-		}
+		ClientTsCsiApiGenerator(delegate.sourcePackage).generate(delegate.model, project.projectDir.toPath())
 	}
 }

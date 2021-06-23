@@ -1,6 +1,6 @@
 plugins {
 	kotlin("multiplatform")
-	id("ru.capjack.bintray")
+	id("ru.capjack.publisher")
 }
 
 kotlin {
@@ -15,6 +15,10 @@ kotlin {
 			api("ru.capjack.csi:csi-core-common")
 			api("ru.capjack.tool:tool-biser")
 			api("ru.capjack.tool:tool-logging")
+			api("org.jetbrains.kotlinx:kotlinx-coroutines-core")
+		}
+		get("jvmMain").dependencies {
+			implementation(kotlin("reflect"))
 		}
 	}
 }

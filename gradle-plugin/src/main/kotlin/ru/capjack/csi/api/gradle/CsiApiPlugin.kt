@@ -2,12 +2,11 @@ package ru.capjack.csi.api.gradle
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.create
 
 open class CsiApiPlugin : Plugin<Project> {
 	override fun apply(project: Project) {
-		project.apply(plugin = "org.jetbrains.kotlin.multiplatform")
+		project.pluginManager.apply("org.jetbrains.kotlin.multiplatform")
 		
 		project.kmp {
 			jvm()

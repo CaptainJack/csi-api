@@ -7,7 +7,7 @@ open class CsiApiExtension(private val project: Project) {
 	
 	private val _targets = mutableSetOf<ApiTarget>()
 	
-	var modelSnapshotFile: File = project.file("src/model.yml")
+	var modelFile: File = project.file("src/model.yml")
 	var sourcePackage = defineSourcePackage(project.kmpSourceDirCommonMain, "")
 	
 	val targets: Set<ApiTarget> get() = _targets
@@ -18,8 +18,8 @@ open class CsiApiExtension(private val project: Project) {
 		}
 	}
 	
-	fun targetClientJsKotlin(name: String = "client", module: String = "csi") {
-		target(ClientJsKotlinApiTarget(name, module))
+	fun targetClientTypescript(name: String = "client") {
+		target(ClientTypescriptApiTarget(name))
 	}
 	
 	fun targetClientKotlin(name: String = "client", vararg platforms: KotlinPlatform = arrayOf(KotlinPlatform.JS)) {
