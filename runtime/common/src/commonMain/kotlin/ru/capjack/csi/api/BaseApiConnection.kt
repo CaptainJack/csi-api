@@ -54,7 +54,8 @@ abstract class BaseApiConnection<IA : BaseInnerApi>(
 					val subscriptionId = reader.readInt()
 					val argumentId = reader.readInt()
 					(context.innerSubscriptions.get(subscriptionId)?.call(argumentId, reader) ?: false).alsoFalse {
-						throw ProtocolBrokenException("Calling an unknown subscription $subscriptionId.$argumentId")
+						context.logger.warn("Calling an unknown subscription $subscriptionId.$argumentId")
+						message.skipRead()
 					}
 				}
 				ApiMessageType.SUBSCRIPTION_CANCEL  -> {

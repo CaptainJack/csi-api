@@ -50,7 +50,7 @@ abstract class OuterService(
 		return _context.callbacks.put(callback)
 	}
 	
-	protected fun _registerSubscription(subscription: InnerSubscription) {
+	fun _registerSubscription(subscription: InnerSubscription) {
 		_context.innerSubscriptions.add(subscription)
 		_subscriptions.add(subscription)
 		if (_closed) {

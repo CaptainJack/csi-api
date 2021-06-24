@@ -115,7 +115,7 @@ class ApiKotlinModelLoader(
 		
 		val arguments = source.valueParameters.map { a ->
 			if (a.type.isFunctionType) {
-				require(result == Method.Result.Subscription) { "Subscription method require Cancelable result (${target.name.full.joinToString(".")}:$name)" }
+				require(result == Method.Result.Subscription || result is Method.Result.InstanceService) { "Subscription method require Cancelable or Closable result (${target.name.full.joinToString(".")}:$name)" }
 				Method.Argument.Subscription(
 					a.name.toString(),
 					a.type.getValueParameterTypesFromFunctionType().map {

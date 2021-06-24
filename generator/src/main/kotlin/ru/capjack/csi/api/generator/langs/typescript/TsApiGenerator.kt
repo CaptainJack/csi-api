@@ -211,7 +211,7 @@ abstract class TsApiGenerator(
 			generateApiAdapterDeclaration(body, iaName, oaName).apply {
 				line()
 				identBracketsCurly("getLoggerName(): string ") {
-					line("return \"${implPackage.full.joinToString(".")}\"")
+					line("return \"${targetPackage.full.joinToString(".")}\"")
 				}
 				
 				line()
@@ -386,15 +386,34 @@ abstract class TsApiGenerator(
 								line("})")
 							}
 							is Method.Result.InstanceService -> {
+								val hasSubscription = arguments.any { it is Method.Argument.Subscription }
+								if (hasSubscription) {
+									line("const ss = ${descriptor.name.self}_${m.name}_OuterSubscription(context, this@${name})")
+								}
+								
 								line {
 									append("this.service.${m.name}(")
-									arguments.indices.joinTo(this) { "a$it" }
+									arguments.forEachIndexed { i, a ->
+										when (a) {
+											is Method.Argument.Value        -> append("a$i")
+											is Method.Argument.Subscription -> append("ss.${a.name}")
+										}
+										if (i != arguments.lastIndex) append(", ")
+									}
 									append(").then(i => {")
 								}
 								ident {
 									line("const s = this.registerInstanceService(i, ${result.descriptor.name.self}InnerDelegate(context, i.service, \"\$name.${m.name}\"))")
+									if (hasSubscription) {
+										addDependency("ru.capjack.tool.utils/Cancelable")
+										line("const ssi = this.registerSubscription(ss, Cancelable.DUMMY)")
+									}
 									line("this.logInstanceServiceResponse(\"${m.name}\", c, s) ")
 									line("this.sendInstanceServiceResponse(c, s) ")
+									if (hasSubscription) {
+										line("this.logSubscriptionResponse(\"${m.name}\", c, ssi) ")
+										line("this.sendSubscriptionResponse(c, ssi) ")
+									}
 								}
 								line("})")
 							}
@@ -499,17 +518,33 @@ abstract class TsApiGenerator(
 											line("_continuation(_result)")
 										}
 										is Method.Result.InstanceService -> {
+											val hasSubscription = m.arguments.any { it is Method.Argument.Subscription }
 											addDependency(r.descriptor.name)
 											addDependency(implPackage.resolveEntityName("${r.descriptor.name.self}Outer"))
 											line("const _service = _reader." + coders.provideReadCall(this, PrimitiveType.INT))
+											
+											if (hasSubscription) {
+												line("const _subscription = _reader." + coders.provideReadCall(this, PrimitiveType.INT))
+											}
+											
 											line("this._logInstanceOpen(\"${m.name}\", _callbackLocal, _service) ")
-											line("_continuation(this._createServiceInstance(new ${r.descriptor.name.self}Outer(this._context, true, _service, `\${this._name}.${m.name}[+\${_service}]`)))")
+											line("const _si = this._createServiceInstance(new ${r.descriptor.name.self}Outer(this._context, true, _service, `\${this._name}.${m.name}[+\${_service}]`))")
+											if (hasSubscription) {
+												line("this._logSubscriptionBegin(\"${m.name}\", _callbackLocal, _subscription) ")
+												line {
+													addDependency(implPackage.resolveEntityName("${name}_${m.name}_InnerSubscription"))
+													append("const t = new ${name}_${m.name}_InnerSubscription(this._context, this, _subscription, ")
+													m.arguments.filterIsInstance<Method.Argument.Subscription>().joinTo(this) { it.name }
+													append(")")
+												}
+												line("_si.service._registerSubscription(t)")
+											}
+											line("_continuation(_si)")
 											
 										}
 										Method.Result.Subscription       -> {
 											line("const _subscription = _reader." + coders.provideReadCall(this, PrimitiveType.INT))
 											line("this._logSubscriptionBegin(\"${m.name}\", _callbackLocal, _subscription) ")
-											
 											line {
 												addDependency(implPackage.resolveEntityName("${name}_${m.name}_InnerSubscription"))
 												append("const t = new ${name}_${m.name}_InnerSubscription(this._context, this, _subscription, ")
@@ -607,8 +642,8 @@ abstract class TsApiGenerator(
 						
 						line("this.logCall(\"${a.name}\", lb => {")
 						ident {
-							a.parameters.forEachIndexed { i, a ->
-								logCall(loggers, i == arguments.lastIndex, a.type, a.name, "p$i")
+							a.parameters.forEachIndexed { i, p ->
+								logCall(loggers, i == a.parameters.lastIndex, p.type, p.name, "p$i")
 							}
 						}
 						line("})")
@@ -629,8 +664,8 @@ abstract class TsApiGenerator(
 									
 									line("this.logCall(\"${a.name}\", lb => {")
 									ident {
-										a.parameters.forEachIndexed { i, a ->
-											logCall(loggers, i == arguments.lastIndex, a.type, a.name, "p$i")
+										a.parameters.forEachIndexed { i, p ->
+											logCall(loggers, i == a.parameters.lastIndex, p.type, p.name, "p$i")
 										}
 									}
 									line("})")

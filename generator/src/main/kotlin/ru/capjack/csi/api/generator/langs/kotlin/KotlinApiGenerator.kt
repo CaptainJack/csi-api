@@ -52,14 +52,14 @@ abstract class KotlinApiGenerator(
 		innerApi.services
 			.fold(hashSetOf<ServiceDescriptor>()) { a, it -> collectServiceDescriptors(a, it.descriptor) }
 			.onEach { s ->
-				s.methods.forEach { m -> if (m.result == Method.Result.Subscription) files.add(generateOuterSubscription(s, m, loggers)) }
+				s.methods.forEach { m -> if (m.arguments.any { it is Method.Argument.Subscription } ) files.add(generateOuterSubscription(s, m, loggers)) }
 			}
 			.mapTo(files) { generateInnerService(it, loggers) }
 		
 		outerApi.services
 			.fold(hashSetOf<ServiceDescriptor>()) { a, it -> collectServiceDescriptors(a, it.descriptor) }
 			.onEach { s ->
-				s.methods.forEach { m -> if (m.result == Method.Result.Subscription) files.add(generateInnerSubscription(s, m, loggers)) }
+				s.methods.forEach { m -> if (m.arguments.any { it is Method.Argument.Subscription } ) files.add(generateInnerSubscription(s, m, loggers)) }
 			}
 			.mapTo(files) { generateOuterService(it, loggers) }
 		
@@ -297,14 +297,32 @@ abstract class KotlinApiGenerator(
 										}
 									}
 									is Method.Result.InstanceService -> {
+										val hasSubscription = arguments.any { it is Method.Argument.Subscription }
+										if (hasSubscription) {
+											line("val ss = ${descriptor.name.self}_${m.name}_OuterSubscription(context, this@${name})")
+										}
 										line {
 											append("val i = service.${m.name}(")
-											arguments.indices.joinTo(this) { "a$it" }
+											arguments.forEachIndexed { i, a ->
+												when (a) {
+													is Method.Argument.Value        -> append("a$i")
+													is Method.Argument.Subscription -> append("ss.${a.name}")
+												}
+												if (i != arguments.lastIndex) append(", ")
+											}
 											append(")")
 										}
 										line("val s = registerInstanceService(i, ${result.descriptor.name.self}InnerDelegate(context, i.service, \"\$name.${m.name}\"))")
+										if (hasSubscription) {
+											addDependency("ru.capjack.tool.utils/Cancelable")
+											line("val ssi = registerSubscription(ss, Cancelable.DUMMY)")
+										}
 										line("logInstanceServiceResponse(\"${m.name}\", c, s) ")
 										line("sendInstanceServiceResponse(c, s) ")
+										if (hasSubscription) {
+											line("logSubscriptionResponse(\"${m.name}\", c, ssi) ")
+											line("sendSubscriptionResponse(c, ssi) ")
+										}
 									}
 									Method.Result.Subscription       -> {
 										line("val s = ${descriptor.name.self}_${m.name}_OuterSubscription(context, this@${name})")
@@ -403,16 +421,31 @@ abstract class KotlinApiGenerator(
 												line("_continuation.resume(_result)")
 											}
 											is Method.Result.InstanceService -> {
+												val hasSubscription = m.arguments.any { it is Method.Argument.Subscription }
 												addDependency(r.descriptor.name)
 												line("val _service = " + coders.provideReadCall(this, PrimitiveType.INT))
+												
+												if (hasSubscription) {
+													line("val _subscription = " + coders.provideReadCall(this, PrimitiveType.INT))
+												}
+												
 												line("_logInstanceOpen(\"${m.name}\", _callbackLocal, _service) ")
-												line("_continuation.resume(_createServiceInstance(${r.descriptor.name.self}Outer(_context, true, _service, \"\$_name.${m.name}[+\$_service]\")))")
+												line("val _si = _createServiceInstance(${r.descriptor.name.self}Outer(_context, true, _service, \"\$_name.${m.name}[+\$_service]\"))")
+												if (hasSubscription) {
+													line("_logSubscriptionBegin(\"${m.name}\", _callbackLocal, _subscription) ")
+													line {
+														append("val t = ${name}_${m.name}_InnerSubscription(_context, this@${name}Outer, _subscription, ")
+														m.arguments.filterIsInstance<Method.Argument.Subscription>().joinTo(this) { it.name }
+														append(")")
+													}
+													line("_si.service._registerSubscription(t)")
+												}
+												line("_continuation.resume(_si)")
 												
 											}
 											Method.Result.Subscription       -> {
 												line("val _subscription = " + coders.provideReadCall(this, PrimitiveType.INT))
 												line("_logSubscriptionBegin(\"${m.name}\", _callbackLocal, _subscription) ")
-												
 												line {
 													append("val t = ${name}_${m.name}_InnerSubscription(_context, this@${name}Outer, _subscription, ")
 													m.arguments.filterIsInstance<Method.Argument.Subscription>().joinTo(this) { it.name }
@@ -497,8 +530,8 @@ abstract class KotlinApiGenerator(
 							}
 							
 							identBracketsCurly("logCall(\"${a.name}\") ") {
-								a.parameters.forEachIndexed { i, a ->
-									logCall(loggers, i == arguments.lastIndex, a.type, a.name, "p$i")
+								a.parameters.forEachIndexed { i, p ->
+									logCall(loggers, i == a.parameters.lastIndex, p.type, p.name, "p$i")
 								}
 							}
 							
@@ -517,8 +550,8 @@ abstract class KotlinApiGenerator(
 										}
 										
 										identBracketsCurly("logCall(\"${a.name}\") ") {
-											a.parameters.forEachIndexed { i, a ->
-												logCall(loggers, i == arguments.lastIndex, a.type, a.name, "p$i")
+											a.parameters.forEachIndexed { i, p ->
+												logCall(loggers, i == a.parameters.lastIndex, p.type, p.name, "p$i")
 											}
 										}
 										
