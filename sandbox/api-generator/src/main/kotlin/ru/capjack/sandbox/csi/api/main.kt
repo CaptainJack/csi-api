@@ -17,6 +17,4 @@ fun main() {
 
 	ClientKotlinCsiApiGenerator(delegate.sourcePackage).generate(delegate.model, projectApiPath.resolve("client/src/commonMain/kotlin"))
 	ServerKotlinCsiApiGenerator(delegate.sourcePackage).generate(delegate.model, projectApiPath.resolve("server/src/commonMain/kotlin"))
-	
-	ClientTsCsiApiGenerator(delegate.sourcePackage).generate(delegate.model, Paths.get("/Users/shnyaka/workspace/projects/capjack/app/CaptainJackSlots/app-CaptainJackSlots-client-new/assets/lib/internal"))
 }

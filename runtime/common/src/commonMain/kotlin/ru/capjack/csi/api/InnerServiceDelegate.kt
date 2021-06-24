@@ -59,6 +59,14 @@ abstract class InnerServiceDelegate<S : Any>(
 		}
 	}
 	
+	protected fun sendInstanceServiceResponse(callback: Int, serviceId: Int, subscriptionId: Int) {
+		sendMethodResponse(callback) {
+			writeInt(serviceId)
+			writeInt(subscriptionId)
+		}
+	}
+	
+	
 	protected fun sendSubscriptionResponse(callback: Int, subscriptionId: Int) {
 		sendMethodResponse(callback) {
 			writeInt(subscriptionId)
@@ -78,6 +86,12 @@ abstract class InnerServiceDelegate<S : Any>(
 	protected fun logInstanceServiceResponse(method: String, callback: Int, serviceId: Int) {
 		logMethodResponse(method, callback) {
 			append("+").append(serviceId)
+		}
+	}
+	
+	protected fun logInstanceServiceResponse(method: String, callback: Int, serviceId: Int, subscriptionId: Int) {
+		logMethodResponse(method, callback) {
+			append("+").append(serviceId).append('~').append(subscriptionId)
 		}
 	}
 	
@@ -142,7 +156,7 @@ abstract class InnerServiceDelegate<S : Any>(
 	
 	internal fun close() {
 		context.logger.debug {
-			"-> $name [close]"
+			"<~ $name [close]"
 		}
 	}
 }

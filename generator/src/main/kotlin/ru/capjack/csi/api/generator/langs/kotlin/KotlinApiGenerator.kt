@@ -316,12 +316,13 @@ abstract class KotlinApiGenerator(
 										if (hasSubscription) {
 											addDependency("ru.capjack.tool.utils/Cancelable")
 											line("val ssi = registerSubscription(ss, Cancelable.DUMMY)")
+										
+											line("logInstanceServiceResponse(\"${m.name}\", c, s, ssi) ")
+											line("sendInstanceServiceResponse(c, s, ssi) ")
 										}
-										line("logInstanceServiceResponse(\"${m.name}\", c, s) ")
-										line("sendInstanceServiceResponse(c, s) ")
-										if (hasSubscription) {
-											line("logSubscriptionResponse(\"${m.name}\", c, ssi) ")
-											line("sendSubscriptionResponse(c, ssi) ")
+										else {
+											line("logInstanceServiceResponse(\"${m.name}\", c, s) ")
+											line("sendInstanceServiceResponse(c, s) ")
 										}
 									}
 									Method.Result.Subscription       -> {
@@ -427,12 +428,15 @@ abstract class KotlinApiGenerator(
 												
 												if (hasSubscription) {
 													line("val _subscription = " + coders.provideReadCall(this, PrimitiveType.INT))
+													line("_logInstanceOpen(\"${m.name}\", _callbackLocal, _service, _subscription) ")
+												}
+												else {
+													line("_logInstanceOpen(\"${m.name}\", _callbackLocal, _service) ")
 												}
 												
-												line("_logInstanceOpen(\"${m.name}\", _callbackLocal, _service) ")
 												line("val _si = _createServiceInstance(${r.descriptor.name.self}Outer(_context, true, _service, \"\$_name.${m.name}[+\$_service]\"))")
+												
 												if (hasSubscription) {
-													line("_logSubscriptionBegin(\"${m.name}\", _callbackLocal, _subscription) ")
 													line {
 														append("val t = ${name}_${m.name}_InnerSubscription(_context, this@${name}Outer, _subscription, ")
 														m.arguments.filterIsInstance<Method.Argument.Subscription>().joinTo(this) { it.name }
@@ -471,19 +475,21 @@ abstract class KotlinApiGenerator(
 									send = "_callMethod(${m.id}, _callback)"
 								}
 								
+								val arguments = m.arguments.filterIsInstance<Method.Argument.Value>()
+								
 								identBracketsCurly(log) {
-									m.arguments.forEachIndexed { i, a ->
-										if (a is Method.Argument.Value) logCall(loggers, m.arguments.lastIndex == i, a.type, a.name)
+									arguments.forEachIndexed { i, a ->
+										logCall(loggers, arguments.lastIndex == i, a.type, a.name)
 									}
 								}
 								
-								if (m.arguments.isEmpty()) {
+								if (arguments.isEmpty()) {
 									line(send)
 								}
 								else {
 									identBracketsCurly("$send ") {
-										m.arguments.forEach { a ->
-											if (a is Method.Argument.Value) line(coders.provideWriteCall(this, a.type, a.name))
+										arguments.forEach { a ->
+											line(coders.provideWriteCall(this, a.type, a.name))
 										}
 									}
 								}

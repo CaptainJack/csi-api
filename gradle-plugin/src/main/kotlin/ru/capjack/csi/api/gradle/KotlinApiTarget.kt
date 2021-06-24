@@ -5,6 +5,7 @@ import ru.capjack.csi.api.generator.langs.kotlin.ClientKotlinCsiApiGenerator
 import ru.capjack.csi.api.generator.langs.kotlin.ServerKotlinCsiApiGenerator
 import ru.capjack.csi.api.generator.langs.typescript.ClientTsCsiApiGenerator
 import ru.capjack.csi.api.generator.model.KotlinApiModelDelegate
+import java.nio.file.Path
 
 abstract class KotlinApiTarget(
 	name: String,
@@ -75,8 +76,8 @@ class ClientKotlinApiTarget(name: String, platforms: Set<KotlinPlatform>) : Kotl
 	}
 }
 
-class ClientTypescriptApiTarget(name: String) : ApiTarget(name) {
+class ClientTypescriptApiTarget(name: String, private val targetSourceDir: Path? = null) : ApiTarget(name) {
 	override fun generate(delegate: KotlinApiModelDelegate) {
-		ClientTsCsiApiGenerator(delegate.sourcePackage).generate(delegate.model, project.projectDir.toPath())
+		ClientTsCsiApiGenerator(delegate.sourcePackage).generate(delegate.model, targetSourceDir ?: project.projectDir.toPath())
 	}
 }

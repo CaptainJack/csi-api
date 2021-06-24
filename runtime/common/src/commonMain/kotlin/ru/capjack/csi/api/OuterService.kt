@@ -105,6 +105,14 @@ abstract class OuterService(
 		}
 	}
 	
+	protected fun _logInstanceOpen(method: String, callback: Int, serviceId: Int, subscriptionId: Int) {
+		_context.logger.debug {
+			_prepareLogCallback(method, callback)
+				.append(": +").append(serviceId).append('~').append(subscriptionId)
+				.toString()
+		}
+	}
+	
 	protected fun _logSubscriptionBegin(method: String, callback: Int, subscriptionId: Int) {
 		_context.logger.debug {
 			_prepareLogCallback(method, callback)

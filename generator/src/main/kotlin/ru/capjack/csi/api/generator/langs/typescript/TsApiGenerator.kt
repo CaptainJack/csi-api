@@ -406,12 +406,13 @@ abstract class TsApiGenerator(
 									if (hasSubscription) {
 										addDependency("ru.capjack.tool.utils/Cancelable")
 										line("const ssi = this.registerSubscription(ss, Cancelable.DUMMY)")
+									
+										line("this.logInstanceServiceSubscriptionResponse(\"${m.name}\", c, s, ssi) ")
+										line("this.sendInstanceServiceSubscriptionResponse(c, s, ssi) ")
 									}
-									line("this.logInstanceServiceResponse(\"${m.name}\", c, s) ")
-									line("this.sendInstanceServiceResponse(c, s) ")
-									if (hasSubscription) {
-										line("this.logSubscriptionResponse(\"${m.name}\", c, ssi) ")
-										line("this.sendSubscriptionResponse(c, ssi) ")
+									else {
+										line("this.logInstanceServiceResponse(\"${m.name}\", c, s) ")
+										line("this.sendInstanceServiceResponse(c, s) ")
 									}
 								}
 								line("})")
@@ -524,12 +525,14 @@ abstract class TsApiGenerator(
 											
 											if (hasSubscription) {
 												line("const _subscription = _reader." + coders.provideReadCall(this, PrimitiveType.INT))
+												line("this._logInstanceSubscriptionOpen(\"${m.name}\", _callbackLocal, _service, _subscription) ")
+											}
+											else {
+												line("this._logInstanceOpen(\"${m.name}\", _callbackLocal, _service) ")
 											}
 											
-											line("this._logInstanceOpen(\"${m.name}\", _callbackLocal, _service) ")
 											line("const _si = this._createServiceInstance(new ${r.descriptor.name.self}Outer(this._context, true, _service, `\${this._name}.${m.name}[+\${_service}]`))")
 											if (hasSubscription) {
-												line("this._logSubscriptionBegin(\"${m.name}\", _callbackLocal, _subscription) ")
 												line {
 													addDependency(implPackage.resolveEntityName("${name}_${m.name}_InnerSubscription"))
 													append("const t = new ${name}_${m.name}_InnerSubscription(this._context, this, _subscription, ")
@@ -570,27 +573,29 @@ abstract class TsApiGenerator(
 								send = "this._callMethodWithCallback(${m.id}, _callback, w => {"
 							}
 							
-							if (m.arguments.isEmpty()) {
+							val arguments = m.arguments.filterIsInstance<Method.Argument.Value>()
+							
+							if (arguments.isEmpty()) {
 								line("$log})")
 							}
 							else {
 								line(log)
 								ident {
-									m.arguments.forEachIndexed { i, a ->
-										if (a is Method.Argument.Value) logCall(loggers, m.arguments.lastIndex == i, a.type, a.name)
+									arguments.forEachIndexed { i, a ->
+										logCall(loggers, arguments.lastIndex == i, a.type, a.name)
 									}
 								}
 								line("})")
 							}
 							
-							if (m.arguments.isEmpty()) {
+							if (arguments.isEmpty()) {
 								line("$send})")
 							}
 							else {
 								line(send)
 								ident {
-									m.arguments.forEach { a ->
-										if (a is Method.Argument.Value) line("w." + coders.provideWriteCall(this, a.type, a.name))
+									arguments.forEach { a ->
+										line("w." + coders.provideWriteCall(this, a.type, a.name))
 									}
 								}
 								line("})")
