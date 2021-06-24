@@ -52,14 +52,14 @@ abstract class KotlinApiGenerator(
 		innerApi.services
 			.fold(hashSetOf<ServiceDescriptor>()) { a, it -> collectServiceDescriptors(a, it.descriptor) }
 			.onEach { s ->
-				s.methods.forEach { m -> if (m.arguments.any { it is Method.Argument.Subscription } ) files.add(generateOuterSubscription(s, m, loggers)) }
+				s.methods.forEach { m -> if (m.arguments.any { it is Method.Argument.Subscription }) files.add(generateOuterSubscription(s, m, loggers)) }
 			}
 			.mapTo(files) { generateInnerService(it, loggers) }
 		
 		outerApi.services
 			.fold(hashSetOf<ServiceDescriptor>()) { a, it -> collectServiceDescriptors(a, it.descriptor) }
 			.onEach { s ->
-				s.methods.forEach { m -> if (m.arguments.any { it is Method.Argument.Subscription } ) files.add(generateInnerSubscription(s, m, loggers)) }
+				s.methods.forEach { m -> if (m.arguments.any { it is Method.Argument.Subscription }) files.add(generateInnerSubscription(s, m, loggers)) }
 			}
 			.mapTo(files) { generateOuterService(it, loggers) }
 		

@@ -12,7 +12,6 @@ import ru.capjack.tool.biser.generator.Code
 import ru.capjack.tool.biser.generator.DependedCode
 import ru.capjack.tool.biser.generator.TypeAggregator
 import ru.capjack.tool.biser.generator.TypeCollector
-import ru.capjack.tool.biser.generator.langs.kotlin.KotlinCodeFile
 import ru.capjack.tool.biser.generator.langs.typescript.TsCodeFile
 import ru.capjack.tool.biser.generator.langs.typescript.TsCodersGenerator
 import ru.capjack.tool.biser.generator.model.*
@@ -57,7 +56,7 @@ abstract class TsApiGenerator(
 			.fold(hashSetOf<ServiceDescriptor>()) { a, it -> collectServiceDescriptors(a, it.descriptor) }
 			.onEach { s ->
 				allServices.add(s)
-				s.methods.forEach { m -> if (m.result == Method.Result.Subscription) files.add(generateOuterSubscription(s, m, loggers)) }
+				s.methods.forEach { m -> if (m.arguments.any { it is Method.Argument.Subscription }) files.add(generateOuterSubscription(s, m, loggers)) }
 			}
 			.mapTo(files) { generateInnerService(it, loggers) }
 		
@@ -65,7 +64,7 @@ abstract class TsApiGenerator(
 			.fold(hashSetOf<ServiceDescriptor>()) { a, it -> collectServiceDescriptors(a, it.descriptor) }
 			.onEach { s ->
 				allServices.add(s)
-				s.methods.forEach { m -> if (m.result == Method.Result.Subscription) files.add(generateInnerSubscription(s, m, loggers)) }
+				s.methods.forEach { m -> if (m.arguments.any { it is Method.Argument.Subscription }) files.add(generateInnerSubscription(s, m, loggers)) }
 			}
 			.mapTo(files) { generateOuterService(it, loggers) }
 		
