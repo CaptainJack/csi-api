@@ -1,7 +1,7 @@
 package ru.capjack.sandbox.csi.api.data
 
 sealed class SealedClass {
-	class SubClass(val a: Int): SealedClass()
+	class SubClass(var a: Int): SealedClass()
 	
 	object SubObject: SealedClass()
 	
