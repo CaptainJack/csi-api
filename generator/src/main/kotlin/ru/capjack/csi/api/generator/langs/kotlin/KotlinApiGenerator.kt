@@ -220,7 +220,7 @@ abstract class KotlinApiGenerator(
 			addDependency(descriptor.name)
 			
 			body.apply {
-				line("@Suppress(\"FunctionName\")")
+				line("@Suppress(\"FunctionName\", \"UNUSED_PARAMETER\")")
 				line("internal class $name(")
 				ident {
 					line("context: Context,")
@@ -266,8 +266,10 @@ abstract class KotlinApiGenerator(
 							}
 							if (hasArguments) {
 								ident {
+									val l = arguments.filterIsInstance<Method.Argument.Value>().size - 1
+									var q = 0
 									arguments.forEachIndexed { i, a ->
-										if (a is Method.Argument.Value) logCall(loggers, i == arguments.lastIndex, a.type, a.name, "a$i")
+										if (a is Method.Argument.Value) logCall(loggers, q++ == l, a.type, a.name, "a$i")
 									}
 								}
 								line("}")
