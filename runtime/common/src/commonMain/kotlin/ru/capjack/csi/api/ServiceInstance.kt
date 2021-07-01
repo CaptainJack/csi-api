@@ -12,5 +12,12 @@ interface ServiceInstance<out S : Any> : Closeable {
 				override fun close() = close()
 			}
 		}
+		
+		operator fun <S : Closeable> invoke(service: S): ServiceInstance<S> {
+			return object : ServiceInstance<S> {
+				override val service: S = service
+				override fun close() = service.close()
+			}
+		}
 	}
 }
