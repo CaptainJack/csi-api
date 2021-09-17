@@ -100,6 +100,22 @@ internal class ServiceDescriptorImpl(override val name: EntityName) : ServiceDes
 		}
 	}
 	
+	override fun provideMethod(id: Int, name: String, suspend: Boolean, arguments: List<Method.Argument>, result: Method.Result?) {
+		val method = methods[name]
+		if (method == null) {
+			methods.add(MethodImpl(id, name, suspend, arguments, result))
+			raiseMutation(Model.Mutation.COMPATIBLY)
+		}
+		else {
+			if (method.id != id) {
+				raiseMutation(Model.Mutation.FULL)
+			}
+			if (method.update(suspend, arguments, result)) {
+				raiseMutation(Model.Mutation.FULL)
+			}
+		}
+	}
+	
 	override fun removeMethods(names: Collection<String>) {
 		val changed = names.fold(false) { r, it -> methods.removeKey(it) != null || r }
 		if (changed) {

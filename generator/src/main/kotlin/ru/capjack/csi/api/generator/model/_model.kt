@@ -31,6 +31,8 @@ interface ServiceDescriptor {
 	
 	fun provideMethod(name: String, suspend: Boolean, arguments: List<Method.Argument>, result: Method.Result?)
 	
+	fun provideMethod(id: Int, name: String, suspend: Boolean, arguments: List<Method.Argument>, result: Method.Result?)
+	
 	fun removeMethods(names: Collection<String>)
 	
 	fun commit(lastMethodId: Int)

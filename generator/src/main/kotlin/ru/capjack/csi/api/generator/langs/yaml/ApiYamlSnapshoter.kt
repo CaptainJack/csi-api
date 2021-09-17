@@ -18,6 +18,7 @@ class ApiYamlSnapshoter : YamlSnapshoter<ApiYamlModel, ApiModel>(ApiYamlModel::c
 			val serviceDescriptor = model.resolveServicesDescriptor(model.resolveEntityName(s.name))
 			s.methods.forEach { m ->
 				serviceDescriptor.provideMethod(
+					m.id,
 					m.name,
 					m.suspend,
 					m.arguments.map { a ->
