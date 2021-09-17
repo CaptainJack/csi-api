@@ -10,7 +10,7 @@ import ru.capjack.csi.api.generator.model.Service
 import ru.capjack.csi.api.generator.model.ServiceDescriptor
 import ru.capjack.tool.biser.generator.Code
 import ru.capjack.tool.biser.generator.DependedCode
-import ru.capjack.tool.biser.generator.TypeAggregator
+import ru.capjack.csi.api.generator.TypeAggregator
 import ru.capjack.tool.biser.generator.TypeCollector
 import ru.capjack.tool.biser.generator.langs.typescript.TsCodeFile
 import ru.capjack.tool.biser.generator.langs.typescript.TsCodersGenerator
@@ -24,20 +24,21 @@ abstract class TsApiGenerator(
 	private val side: String,
 	private val generateSources: Boolean = true
 ) {
-	private val targetPackage = model.nameSpace.resolvePackageName(targetPackage)
+	val targetPackage = model.nameSpace.resolvePackageName(targetPackage)
 	private val implPackage = this.targetPackage.resolvePackageName("_impl")
 	
 	protected abstract fun generate(files: MutableList<TsCodeFile>)
 	
 	protected abstract fun generateApiAdapterDeclaration(code: Code, iaName: String, oaName: String): Code
 	
-	open fun generate(targetSourceDir: Path) {
-		targetSourceDir.resolve(targetPackage.full.joinToString("/")).toFile().deleteRecursively()
-		
+	open fun generate(targetSourceDir: Path): Collection<Path> {
+		val generatedFile = mutableSetOf<Path>()
 		val files = mutableListOf<TsCodeFile>()
 		generate(files)
 		
-		files.forEach { it.save(targetSourceDir) }
+		files.forEach { generatedFile.add(it.save(targetSourceDir)) }
+		
+		return generatedFile
 	}
 	
 	protected fun generate(innerApi: Api, outerApi: Api, files: MutableList<TsCodeFile>) {

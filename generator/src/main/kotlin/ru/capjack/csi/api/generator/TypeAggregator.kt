@@ -1,5 +1,6 @@
-package ru.capjack.tool.biser.generator
+package ru.capjack.csi.api.generator
 
+import ru.capjack.tool.biser.generator.TypeCollector
 import ru.capjack.tool.biser.generator.model.Type
 
 internal class TypeAggregator : TypeCollector, Iterator<Type> {

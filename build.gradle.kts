@@ -11,7 +11,7 @@ depver {
 		"tool-logging"("1.5.0")
 		"tool-io"("1.0.0")
 		"tool-biser"("1.1.0")
-		"tool-biser-generator"("1.1.2")
+		"tool-biser-generator"("1.2.0")
 	}
 	"ru.capjack.csi" {
 		"csi-core-*"("1.1.0")

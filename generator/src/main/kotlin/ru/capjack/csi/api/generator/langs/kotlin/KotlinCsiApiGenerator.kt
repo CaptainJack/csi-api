@@ -8,8 +8,22 @@ import java.nio.file.Path
 abstract class KotlinCsiApiGenerator(protected val sourcePackage: String) : CsiApiGenerator {
 	override fun generate(model: ApiModel, targetSourceDir: Path) {
 		val codersGenerator = createCodersGenerator(model)
-		createApiGenerator(model, codersGenerator).generate(targetSourceDir)
-		codersGenerator.generate(targetSourceDir)
+		val apiGenerator = createApiGenerator(model, codersGenerator)
+		
+		val target = targetSourceDir.resolve(apiGenerator.targetPackage.full.joinToString("/")).toFile()
+		val files = mutableSetOf<Path>()
+		
+		files.addAll(apiGenerator.generate(targetSourceDir))
+		files.addAll(codersGenerator.generate(targetSourceDir))
+		
+		target.walkBottomUp().forEach {
+			if (it.isDirectory) {
+				if (it.listFiles()?.size == 0) it.delete()
+			}
+			else if (!files.contains(it.toPath())) {
+				it.delete()
+			}
+		}
 	}
 	
 	protected abstract fun createApiGenerator(model: ApiModel, codersGenerator: KotlinCodersGenerator): KotlinApiGenerator
