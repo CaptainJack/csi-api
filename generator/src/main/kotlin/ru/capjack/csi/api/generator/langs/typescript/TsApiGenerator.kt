@@ -3,19 +3,18 @@
 package ru.capjack.csi.api.generator.langs.typescript
 
 import ru.capjack.csi.api.generator.LogCallVisitorData
+import ru.capjack.csi.api.generator.TypeAggregator
 import ru.capjack.csi.api.generator.model.Api
 import ru.capjack.csi.api.generator.model.ApiModel
 import ru.capjack.csi.api.generator.model.Method
 import ru.capjack.csi.api.generator.model.Service
 import ru.capjack.csi.api.generator.model.ServiceDescriptor
 import ru.capjack.tool.biser.generator.Code
+import ru.capjack.tool.biser.generator.CodeSource
 import ru.capjack.tool.biser.generator.DependedCode
-import ru.capjack.csi.api.generator.TypeAggregator
 import ru.capjack.tool.biser.generator.TypeCollector
-import ru.capjack.tool.biser.generator.langs.typescript.TsCodeFile
 import ru.capjack.tool.biser.generator.langs.typescript.TsCodersGenerator
 import ru.capjack.tool.biser.generator.model.*
-import java.nio.file.Path
 
 abstract class TsApiGenerator(
 	protected val model: ApiModel,
@@ -27,68 +26,58 @@ abstract class TsApiGenerator(
 	val targetPackage = model.nameSpace.resolvePackageName(targetPackage)
 	private val implPackage = this.targetPackage.resolvePackageName("_impl")
 	
-	protected abstract fun generate(files: MutableList<TsCodeFile>)
+	abstract fun generate(codeSource: CodeSource)
 	
 	protected abstract fun generateApiAdapterDeclaration(code: Code, iaName: String, oaName: String): Code
 	
-	open fun generate(targetSourceDir: Path): Collection<Path> {
-		val generatedFile = mutableSetOf<Path>()
-		val files = mutableListOf<TsCodeFile>()
-		generate(files)
-		
-		files.forEach { generatedFile.add(it.save(targetSourceDir)) }
-		
-		return generatedFile
-	}
-	
-	protected fun generate(innerApi: Api, outerApi: Api, files: MutableList<TsCodeFile>) {
+	protected fun generate(innerApi: Api, outerApi: Api, codeSource: CodeSource) {
 		val loggers = TypeAggregator()
 		
-		files.add(generateApiVersion())
-		files.add(generateInnerApi(innerApi))
-		files.add(generateOuterApi(outerApi))
-		files.add(generateOuterApiImpl(outerApi))
-		files.add(generateApiAdapter(innerApi, outerApi))
-		files.add(generateApiConnection(innerApi))
+		generateApiVersion(codeSource)
+		generateInnerApi(codeSource, innerApi)
+		generateOuterApi(codeSource, outerApi)
+		generateOuterApiImpl(codeSource, outerApi)
+		generateApiAdapter(codeSource, innerApi, outerApi)
+		generateApiConnection(codeSource, innerApi)
 		
 		val allServices = hashSetOf<ServiceDescriptor>()
 		
 		innerApi.services
 			.fold(hashSetOf<ServiceDescriptor>()) { a, it -> collectServiceDescriptors(a, it.descriptor) }
-			.onEach { s ->
+			.forEach { s ->
 				allServices.add(s)
-				s.methods.forEach { m -> if (m.arguments.any { it is Method.Argument.Subscription }) files.add(generateOuterSubscription(s, m, loggers)) }
+				s.methods.forEach { m -> if (m.arguments.any { it is Method.Argument.Subscription }) generateOuterSubscription(codeSource, s, m, loggers) }
+				generateInnerService(codeSource, s, loggers)
 			}
-			.mapTo(files) { generateInnerService(it, loggers) }
 		
 		outerApi.services
 			.fold(hashSetOf<ServiceDescriptor>()) { a, it -> collectServiceDescriptors(a, it.descriptor) }
-			.onEach { s ->
+			.forEach { s ->
 				allServices.add(s)
-				s.methods.forEach { m -> if (m.arguments.any { it is Method.Argument.Subscription }) files.add(generateInnerSubscription(s, m, loggers)) }
+				s.methods.forEach { m -> if (m.arguments.any { it is Method.Argument.Subscription }) generateInnerSubscription(codeSource, s, m, loggers) }
+				generateOuterService(codeSource, s, loggers)
 			}
-			.mapTo(files) { generateOuterService(it, loggers) }
 		
 		if (loggers.hasNext()) {
-			files.add(generateLogging(loggers))
+			generateLogging(codeSource, loggers)
 		}
 		
 		if (generateSources) {
-			files.add(generateSourceApi(innerApi))
-			files.add(generateSourceApi(outerApi))
+			generateSourceApi(codeSource, innerApi)
+			generateSourceApi(codeSource, outerApi)
 			
-			allServices.mapTo(files) { generateSourceService(it) }
+			allServices.forEach { generateSourceService(codeSource, it) }
 		}
 	}
 	
-	private fun generateApiVersion(): TsCodeFile {
-		return TsCodeFile(implPackage.resolveEntityName("_version")).apply {
+	private fun generateApiVersion(codeSource: CodeSource) {
+		codeSource.newFile(implPackage.resolveEntityName("_version")).apply {
 			body.line("export const API_VERSION = ${model.version.compatible}")
 		}
 	}
 	
-	private fun generateSourceApi(api: Api): TsCodeFile {
-		return TsCodeFile(targetPackage.resolveEntityName(api.name)).apply {
+	private fun generateSourceApi(codeSource: CodeSource, api: Api) {
+		codeSource.newFile(targetPackage.resolveEntityName(api.name)).apply {
 			body.identBracketsCurly("export interface ${api.name} ") {
 				api.services.sortedBy(Service::id).forEach {
 					addDependency(it.descriptor.name)
@@ -98,9 +87,9 @@ abstract class TsApiGenerator(
 		}
 	}
 	
-	private fun generateSourceService(descriptor: ServiceDescriptor): TsCodeFile {
+	private fun generateSourceService(codeSource: CodeSource, descriptor: ServiceDescriptor) {
 		val type = model.resolveEntityType(descriptor.name)
-		return TsCodeFile(descriptor.name).apply {
+		codeSource.newFile(descriptor.name).apply {
 			body.identBracketsCurly("export interface ${coders.getTypeName(type, this)} ") {
 				descriptor.methods.forEach { m ->
 					line {
@@ -137,10 +126,10 @@ abstract class TsApiGenerator(
 		return target
 	}
 	
-	private fun generateInnerApi(api: Api): TsCodeFile {
+	private fun generateInnerApi(codeSource: CodeSource, api: Api) {
 		val name = "Internal${api.name}"
 		
-		return TsCodeFile(implPackage.resolveEntityName(name)).apply {
+		codeSource.newFile(implPackage.resolveEntityName(name)).apply {
 			addDependency("ru.capjack.csi.api.$side/InnerApi")
 			addDependency(targetPackage.resolveEntityName(api.name))
 			
@@ -148,10 +137,10 @@ abstract class TsApiGenerator(
 		}
 	}
 	
-	private fun generateOuterApi(api: Api): TsCodeFile {
+	private fun generateOuterApi(codeSource: CodeSource, api: Api) {
 		val name = "Internal${api.name}"
 		
-		return TsCodeFile(implPackage.resolveEntityName(name)).apply {
+		codeSource.newFile(implPackage.resolveEntityName(name)).apply {
 			addDependency("ru.capjack.csi.api/OuterApi")
 			addDependency(targetPackage.resolveEntityName(api.name))
 			
@@ -159,10 +148,10 @@ abstract class TsApiGenerator(
 		}
 	}
 	
-	private fun generateOuterApiImpl(api: Api): TsCodeFile {
+	private fun generateOuterApiImpl(codeSource: CodeSource, api: Api) {
 		val name = "Internal${api.name}Impl"
 		
-		return TsCodeFile(implPackage.resolveEntityName(name)).apply {
+		codeSource.newFile(implPackage.resolveEntityName(name)).apply {
 			addDependency("ru.capjack.csi.api/AbstractOuterApi")
 			addDependency("ru.capjack.csi.api/Context")
 			addDependency(implPackage.resolveEntityName("InternalServerApi"))
@@ -189,8 +178,8 @@ abstract class TsApiGenerator(
 		}
 	}
 	
-	private fun generateApiAdapter(innerApi: Api, outerApi: Api): TsCodeFile {
-		return TsCodeFile(implPackage.resolveEntityName("ApiAdapter")).apply {
+	private fun generateApiAdapter(codeSource: CodeSource, innerApi: Api, outerApi: Api) {
+		codeSource.newFile(implPackage.resolveEntityName("ApiAdapter")).apply {
 			addDependency("ru.capjack.csi.api/CallbacksRegister")
 			addDependency("ru.capjack.csi.api/Context")
 			addDependency("ru.capjack.csi.api.$side/AbstractApiAdapter")
@@ -229,8 +218,7 @@ abstract class TsApiGenerator(
 					if (outerApi.services.any { s -> s.descriptor.methods.any { it.result != null } }) {
 						addDependency("ru.capjack.csi.api/RealCallbacksRegister")
 						line("return new RealCallbacksRegister()")
-					}
-					else {
+					} else {
 						addDependency("ru.capjack.csi.api/NothingCallbacksRegister")
 						line("return new NothingCallbacksRegister()")
 					}
@@ -240,10 +228,10 @@ abstract class TsApiGenerator(
 		}
 	}
 	
-	private fun generateApiConnection(api: Api): TsCodeFile {
+	private fun generateApiConnection(codeSource: CodeSource, api: Api) {
 		val iaInternalName = "Internal${api.name}"
 		
-		return TsCodeFile(implPackage.resolveEntityName("ApiConnection")).apply {
+		codeSource.newFile(implPackage.resolveEntityName("ApiConnection")).apply {
 			addDependency("ru.capjack.csi.api/Context")
 			addDependency("ru.capjack.csi.api/InnerServiceDelegate")
 			addDependency("ru.capjack.csi.api.$side/AbstractApiConnection")
@@ -289,10 +277,10 @@ abstract class TsApiGenerator(
 		}
 	}
 	
-	private fun generateInnerService(descriptor: ServiceDescriptor, loggers: TypeCollector): TsCodeFile {
+	private fun generateInnerService(codeSource: CodeSource, descriptor: ServiceDescriptor, loggers: TypeCollector) {
 		val name = "${descriptor.name.self}InnerDelegate"
 		
-		return TsCodeFile(implPackage.resolveEntityName(name)).apply {
+		codeSource.newFile(implPackage.resolveEntityName(name)).apply {
 			addDependency("ru.capjack.csi.api/Context")
 			addDependency("ru.capjack.csi.api/InnerServiceDelegate")
 			addDependency("ru.capjack.tool.biser/BiserReader")
@@ -341,8 +329,7 @@ abstract class TsApiGenerator(
 						line {
 							if (result == null) {
 								append("this.logMethodCall(\"${m.name}\", lb => {")
-							}
-							else {
+							} else {
 								append("this.logMethodCallWithCallback(\"${m.name}\", c, lb => {")
 							}
 							if (!hasArguments) append("})")
@@ -407,11 +394,10 @@ abstract class TsApiGenerator(
 									if (hasSubscription) {
 										addDependency("ru.capjack.tool.utils/Cancelable")
 										line("const ssi = this.registerSubscription(ss, Cancelable.DUMMY)")
-									
+										
 										line("this.logInstanceServiceSubscriptionResponse(\"${m.name}\", c, s, ssi) ")
 										line("this.sendInstanceServiceSubscriptionResponse(c, s, ssi) ")
-									}
-									else {
+									} else {
 										line("this.logInstanceServiceResponse(\"${m.name}\", c, s) ")
 										line("this.sendInstanceServiceResponse(c, s) ")
 									}
@@ -447,10 +433,10 @@ abstract class TsApiGenerator(
 		}
 	}
 	
-	private fun generateOuterService(descriptor: ServiceDescriptor, loggers: TypeCollector): TsCodeFile {
+	private fun generateOuterService(codeSource: CodeSource, descriptor: ServiceDescriptor, loggers: TypeCollector) {
 		val name = descriptor.name.self
 		
-		return TsCodeFile(implPackage.resolveEntityName("${name}Outer")).apply {
+		codeSource.newFile(implPackage.resolveEntityName("${name}Outer")).apply {
 			addDependency(descriptor.name)
 			addDependency("ru.capjack.csi.api/OuterService")
 			addDependency("ru.capjack.csi.api/Context")
@@ -502,8 +488,7 @@ abstract class TsApiGenerator(
 						(if (r != null) {
 							line("return new Promise(_continuation => {")
 							ident()
-						}
-						else this).apply {
+						} else this).apply {
 							
 							if (r != null) {
 								line("const _callback = this._registerCallback((_reader, _callbackLocal) => {")
@@ -527,8 +512,7 @@ abstract class TsApiGenerator(
 											if (hasSubscription) {
 												line("const _subscription = _reader." + coders.provideReadCall(this, PrimitiveType.INT))
 												line("this._logInstanceSubscriptionOpen(\"${m.name}\", _callbackLocal, _service, _subscription) ")
-											}
-											else {
+											} else {
 												line("this._logInstanceOpen(\"${m.name}\", _callbackLocal, _service) ")
 											}
 											
@@ -568,8 +552,7 @@ abstract class TsApiGenerator(
 							if (r == null) {
 								log = "this._logMethodCall(\"${m.name}\", lb => {"
 								send = "this._callMethod(${m.id}, w => {"
-							}
-							else {
+							} else {
 								log = "this._logMethodCallWithCallback(\"${m.name}\", _callback, lb => {"
 								send = "this._callMethodWithCallback(${m.id}, _callback, w => {"
 							}
@@ -578,8 +561,7 @@ abstract class TsApiGenerator(
 							
 							if (arguments.isEmpty()) {
 								line("$log})")
-							}
-							else {
+							} else {
 								line(log)
 								ident {
 									arguments.forEachIndexed { i, a ->
@@ -591,8 +573,7 @@ abstract class TsApiGenerator(
 							
 							if (arguments.isEmpty()) {
 								line("$send})")
-							}
-							else {
+							} else {
 								line(send)
 								ident {
 									arguments.forEach { a ->
@@ -611,10 +592,10 @@ abstract class TsApiGenerator(
 		}
 	}
 	
-	private fun generateInnerSubscription(service: ServiceDescriptor, method: Method, loggers: TypeAggregator): TsCodeFile {
+	private fun generateInnerSubscription(codeSource: CodeSource, service: ServiceDescriptor, method: Method, loggers: TypeAggregator) {
 		val name = "${service.name.self}_${method.name}_InnerSubscription"
 		val arguments = method.arguments.filterIsInstance<Method.Argument.Subscription>()
-		return TsCodeFile(implPackage.resolveEntityName(name)).apply {
+		codeSource.newFile(implPackage.resolveEntityName(name)).apply {
 			addDependency("ru.capjack.csi.api/Context")
 			addDependency("ru.capjack.csi.api/OuterService")
 			addDependency("ru.capjack.csi.api/InnerSubscription")
@@ -658,8 +639,7 @@ abstract class TsApiGenerator(
 							a.parameters.indices.joinTo(this) { "p$it" }
 							append(')')
 						}
-					}
-					else {
+					} else {
 						identBracketsCurly("switch (argumentId) ") {
 							arguments.forEachIndexed { q, a ->
 								identBracketsCurly("case $q: ") {
@@ -693,10 +673,10 @@ abstract class TsApiGenerator(
 		}
 	}
 	
-	private fun generateOuterSubscription(service: ServiceDescriptor, method: Method, loggers: TypeAggregator): TsCodeFile {
+	private fun generateOuterSubscription(codeSource: CodeSource, service: ServiceDescriptor, method: Method, loggers: TypeAggregator) {
 		val name = "${service.name.self}_${method.name}_OuterSubscription"
 		val arguments = method.arguments.filterIsInstance<Method.Argument.Subscription>()
-		return TsCodeFile(implPackage.resolveEntityName(name)).apply {
+		codeSource.newFile(implPackage.resolveEntityName(name)).apply {
 			addDependency("ru.capjack.csi.api/Context")
 			addDependency("ru.capjack.csi.api/InnerServiceDelegate")
 			addDependency("ru.capjack.csi.api/OuterSubscription")
@@ -730,8 +710,7 @@ abstract class TsApiGenerator(
 							}
 							if (a.parameters.isEmpty()) {
 								line("call($id)")
-							}
-							else {
+							} else {
 								identBracketsCurly("call($id) ") {
 									a.parameters.forEachIndexed { i, p ->
 										line(coders.provideWriteCall(this, p.type, "p$i"))
@@ -767,8 +746,8 @@ abstract class TsApiGenerator(
 		}.toString()
 	}
 	
-	private fun generateLogging(loggers: TypeAggregator): TsCodeFile {
-		return TsCodeFile(implPackage.resolveEntityName("_logging")).apply {
+	private fun generateLogging(codeSource: CodeSource, loggers: TypeAggregator) {
+		codeSource.newFile(implPackage.resolveEntityName("_logging")).apply {
 			addDependency("ru.capjack.csi.api/LogBuilder")
 			header.line("// noinspection DuplicatedCode,JSUnusedLocalSymbols")
 			header.line()
@@ -801,8 +780,7 @@ abstract class TsApiGenerator(
 			
 			if (data.argName == null) {
 				data.code.line("lb.$fn(${data.argVal})")
-			}
-			else {
+			} else {
 				data.code.line("lb.${fn}Arg(\"${data.argName}\", ${data.argVal})")
 			}
 		}
@@ -812,20 +790,17 @@ abstract class TsApiGenerator(
 				val fn = if (data.sep) "logArraySep" else "logArray"
 				if (data.argName == null) {
 					data.code.line("lb.$fn(${data.argVal})")
-				}
-				else {
+				} else {
 					data.code.line("lb.${fn}Arg(\"${data.argName}\", ${data.argVal})")
 				}
-			}
-			else {
+			} else {
 				val fn = if (data.sep) "logSep" else "log"
 				val logger = defineLogName(type)
 				data.loggers.add(type)
 				data.code.addDependency(implPackage.resolveEntityName("_logging"), logger)
 				if (data.argName == null) {
 					data.code.line("lb.${fn}With(${data.argVal}, $logger)")
-				}
-				else {
+				} else {
 					data.code.line("lb.${fn}WithArg(\"${data.argName}\", ${data.argVal}, $logger)")
 				}
 			}
@@ -838,8 +813,7 @@ abstract class TsApiGenerator(
 			data.code.addDependency(implPackage.resolveEntityName("_logging"), logger)
 			if (data.argName == null) {
 				data.code.line("lb.${fn}With(${data.argVal}, $logger)")
-			}
-			else {
+			} else {
 				data.code.line("lb.${fn}WithArg(\"${data.argName}\", ${data.argVal}, $logger)")
 			}
 		}
@@ -851,8 +825,7 @@ abstract class TsApiGenerator(
 			data.code.addDependency(implPackage.resolveEntityName("_logging"), logger)
 			if (data.argName == null) {
 				data.code.line("lb.${fn}(${data.argVal}, $logger)")
-			}
-			else {
+			} else {
 				data.code.line("lb.${fn}Arg(\"${data.argName}\", ${data.argVal}, $logger)")
 			}
 		}
@@ -863,20 +836,17 @@ abstract class TsApiGenerator(
 				val n = coders.getTypeName(type, data.code)
 				if (data.argName == null) {
 					data.code.line("lb.$fn($n[${data.argVal}])")
-				}
-				else {
+				} else {
 					data.code.line("lb.${fn}Arg(\"${data.argName}\", $n[${data.argVal}])")
 				}
-			}
-			else {
+			} else {
 				val fn = if (data.sep) "logSepWith" else "logWith"
 				val logger = defineLogName(type)
 				data.loggers.add(type)
 				data.code.addDependency(implPackage.resolveEntityName("_logging"), logger)
 				if (data.argName == null) {
 					data.code.line("lb.${fn}(${data.argVal}, $logger)")
-				}
-				else {
+				} else {
 					data.code.line("lb.${fn}Arg(\"${data.argName}\", ${data.argVal}, $logger)")
 				}
 			}
@@ -947,8 +917,7 @@ abstract class TsApiGenerator(
 			data.code.apply {
 				if (entity.children.isEmpty()) {
 					visitClassEntity0(entity, data)
-				}
-				else {
+				} else {
 					identBracketsCurly("switch (true) ") {
 						entity.children.forEach {
 							val type = model.resolveEntityType(it.name)
@@ -959,8 +928,7 @@ abstract class TsApiGenerator(
 						if (entity.abstract) {
 							data.code.addDependency("ru.capjack.tool.lang.exceptions/UnsupportedOperationException")
 							line("default: throw new UnsupportedOperationException()")
-						}
-						else {
+						} else {
 							identBracketsCurly("default:  ") {
 								visitClassEntity0(entity, data)
 								line("break")

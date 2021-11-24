@@ -3,6 +3,7 @@
 package ru.capjack.csi.api.generator.langs.kotlin
 
 import ru.capjack.csi.api.generator.LogCallVisitorData
+import ru.capjack.csi.api.generator.TypeAggregator
 import ru.capjack.csi.api.generator.model.Api
 import ru.capjack.csi.api.generator.model.ApiModel
 import ru.capjack.csi.api.generator.model.Method
@@ -10,12 +11,10 @@ import ru.capjack.csi.api.generator.model.Service
 import ru.capjack.csi.api.generator.model.ServiceDescriptor
 import ru.capjack.tool.biser.generator.Code
 import ru.capjack.tool.biser.generator.DependedCode
-import ru.capjack.csi.api.generator.TypeAggregator
 import ru.capjack.tool.biser.generator.TypeCollector
-import ru.capjack.tool.biser.generator.langs.kotlin.KotlinCodeFile
+import ru.capjack.tool.biser.generator.langs.kotlin.KotlinCodeSource
 import ru.capjack.tool.biser.generator.langs.kotlin.KotlinCodersGenerator
 import ru.capjack.tool.biser.generator.model.*
-import java.nio.file.Path
 
 abstract class KotlinApiGenerator(
 	protected val model: ApiModel,
@@ -26,51 +25,41 @@ abstract class KotlinApiGenerator(
 	val targetPackage = model.nameSpace.resolvePackageName(targetPackage)
 	private val sidePackage = this.targetPackage.resolvePackageName(side)
 	
-	protected abstract fun generate(files: MutableList<KotlinCodeFile>)
+	abstract fun generate(codeSource: KotlinCodeSource)
 	
 	protected abstract fun generateApiAdapterDeclaration(code: Code, iaName: String, oaName: String): Code
 	
-	open fun generate(targetSourceDir: Path): Collection<Path> {
-		val generatedFile = mutableSetOf<Path>()
-		val files = mutableListOf<KotlinCodeFile>()
-		generate(files)
-		
-		files.forEach { generatedFile.add(it.save(targetSourceDir)) }
-		
-		return generatedFile
-	}
-	
-	protected fun generate(innerApi: Api, outerApi: Api, files: MutableList<KotlinCodeFile>) {
+	protected fun generate(innerApi: Api, outerApi: Api, codeSource: KotlinCodeSource) {
 		val loggers = TypeAggregator()
 		
-		files.add(generateApiVersion())
-		files.add(generateInnerApi(innerApi))
-		files.add(generateOuterApi(outerApi))
-		files.add(generateOuterApiImpl(outerApi))
-		files.add(generateApiAdapter(innerApi, outerApi))
-		files.add(generateApiConnection(innerApi))
+		generateApiVersion(codeSource)
+		generateInnerApi(codeSource, innerApi)
+		generateOuterApi(codeSource, outerApi)
+		generateOuterApiImpl(codeSource, outerApi)
+		generateApiAdapter(codeSource, innerApi, outerApi)
+		generateApiConnection(codeSource, innerApi)
 		
 		innerApi.services
 			.fold(hashSetOf<ServiceDescriptor>()) { a, it -> collectServiceDescriptors(a, it.descriptor) }
-			.onEach { s ->
-				s.methods.forEach { m -> if (m.arguments.any { it is Method.Argument.Subscription }) files.add(generateOuterSubscription(s, m, loggers)) }
+			.forEach { s ->
+				s.methods.forEach { m -> if (m.arguments.any { it is Method.Argument.Subscription }) generateOuterSubscription(codeSource, s, m, loggers) }
+				generateInnerService(codeSource, s, loggers)
 			}
-			.mapTo(files) { generateInnerService(it, loggers) }
 		
 		outerApi.services
 			.fold(hashSetOf<ServiceDescriptor>()) { a, it -> collectServiceDescriptors(a, it.descriptor) }
-			.onEach { s ->
-				s.methods.forEach { m -> if (m.arguments.any { it is Method.Argument.Subscription }) files.add(generateInnerSubscription(s, m, loggers)) }
+			.forEach { s ->
+				s.methods.forEach { m -> if (m.arguments.any { it is Method.Argument.Subscription }) generateInnerSubscription(codeSource, s, m, loggers) }
+				generateOuterService(codeSource, s, loggers)
 			}
-			.mapTo(files) { generateOuterService(it, loggers) }
 		
 		if (loggers.hasNext()) {
-			files.add(generateLogging(loggers))
+			generateLogging(codeSource, loggers)
 		}
 	}
 	
-	private fun generateApiVersion(): KotlinCodeFile {
-		return KotlinCodeFile(targetPackage.resolveEntityName("_version")).apply {
+	private fun generateApiVersion(codeSource: KotlinCodeSource) {
+		codeSource.newFile(targetPackage.resolveEntityName("_version")).apply {
 			body.line("const val API_VERSION = ${model.version.compatible}")
 		}
 	}
@@ -84,10 +73,10 @@ abstract class KotlinApiGenerator(
 		return target
 	}
 	
-	private fun generateInnerApi(api: Api): KotlinCodeFile {
+	private fun generateInnerApi(codeSource: KotlinCodeSource, api: Api) {
 		val name = "Internal${api.name}"
 		
-		return KotlinCodeFile(sidePackage.resolveEntityName(name)).apply {
+		codeSource.newFile(sidePackage.resolveEntityName(name)).apply {
 			addDependency("ru.capjack.csi.api.$side/InnerApi")
 			addDependency(targetPackage.resolveEntityName(api.name))
 			
@@ -95,10 +84,10 @@ abstract class KotlinApiGenerator(
 		}
 	}
 	
-	private fun generateOuterApi(api: Api): KotlinCodeFile {
+	private fun generateOuterApi(codeSource: KotlinCodeSource, api: Api) {
 		val name = "Internal${api.name}"
 		
-		return KotlinCodeFile(sidePackage.resolveEntityName(name)).apply {
+		codeSource.newFile(sidePackage.resolveEntityName(name)).apply {
 			addDependency("ru.capjack.csi.api/OuterApi")
 			addDependency(targetPackage.resolveEntityName(api.name))
 			
@@ -106,10 +95,10 @@ abstract class KotlinApiGenerator(
 		}
 	}
 	
-	private fun generateOuterApiImpl(api: Api): KotlinCodeFile {
+	private fun generateOuterApiImpl(codeSource: KotlinCodeSource, api: Api) {
 		val name = "Internal${api.name}Impl"
 		
-		return KotlinCodeFile(sidePackage.resolveEntityName(name)).apply {
+		codeSource.newFile(sidePackage.resolveEntityName(name)).apply {
 			addDependency("ru.capjack.csi.api/AbstractOuterApi")
 			addDependency("ru.capjack.csi.api/Context")
 			
@@ -128,8 +117,8 @@ abstract class KotlinApiGenerator(
 		}
 	}
 	
-	private fun generateApiAdapter(innerApi: Api, outerApi: Api): KotlinCodeFile {
-		return KotlinCodeFile(sidePackage.resolveEntityName("ApiAdapter")).apply {
+	private fun generateApiAdapter(codeSource: KotlinCodeSource, innerApi: Api, outerApi: Api) {
+		codeSource.newFile(sidePackage.resolveEntityName("ApiAdapter")).apply {
 			addDependency("kotlinx.coroutines/CoroutineScope")
 			addDependency("ru.capjack.csi.api/CallbacksRegister")
 			addDependency("ru.capjack.csi.api/Context")
@@ -163,8 +152,7 @@ abstract class KotlinApiGenerator(
 					if (outerApi.services.any { s -> s.descriptor.methods.any { it.result != null } }) {
 						addDependency("ru.capjack.csi.api/RealCallbacksRegister")
 						line("return RealCallbacksRegister()")
-					}
-					else {
+					} else {
 						addDependency("ru.capjack.csi.api/NothingCallbacksRegister")
 						line("return NothingCallbacksRegister")
 					}
@@ -174,10 +162,10 @@ abstract class KotlinApiGenerator(
 		}
 	}
 	
-	private fun generateApiConnection(api: Api): KotlinCodeFile {
+	private fun generateApiConnection(codeSource: KotlinCodeSource, api: Api) {
 		val iaInternalName = "Internal${api.name}"
 		
-		return KotlinCodeFile(sidePackage.resolveEntityName("ApiConnection")).apply {
+		codeSource.newFile(sidePackage.resolveEntityName("ApiConnection")).apply {
 			addDependency("ru.capjack.csi.api/Context")
 			addDependency("ru.capjack.csi.api/InnerServiceDelegate")
 			addDependency("ru.capjack.csi.api.$side/AbstractApiConnection")
@@ -211,10 +199,10 @@ abstract class KotlinApiGenerator(
 		}
 	}
 	
-	private fun generateInnerService(descriptor: ServiceDescriptor, loggers: TypeCollector): KotlinCodeFile {
+	private fun generateInnerService(codeSource: KotlinCodeSource, descriptor: ServiceDescriptor, loggers: TypeCollector) {
 		val name = "${descriptor.name.self}InnerDelegate"
 		
-		return KotlinCodeFile(sidePackage.resolveEntityName(name)).apply {
+		codeSource.newFile(sidePackage.resolveEntityName(name)).apply {
 			addDependency("ru.capjack.csi.api/Context")
 			addDependency("ru.capjack.csi.api/InnerServiceDelegate")
 			addDependency("ru.capjack.tool.biser/BiserReader")
@@ -319,11 +307,10 @@ abstract class KotlinApiGenerator(
 										if (hasSubscription) {
 											addDependency("ru.capjack.tool.utils/Cancelable")
 											line("val ssi = registerSubscription(ss, Cancelable.DUMMY)")
-										
+											
 											line("logInstanceServiceResponse(\"${m.name}\", c, s, ssi) ")
 											line("sendInstanceServiceResponse(c, s, ssi) ")
-										}
-										else {
+										} else {
 											line("logInstanceServiceResponse(\"${m.name}\", c, s) ")
 											line("sendInstanceServiceResponse(c, s) ")
 										}
@@ -356,10 +343,10 @@ abstract class KotlinApiGenerator(
 		}
 	}
 	
-	private fun generateOuterService(descriptor: ServiceDescriptor, loggers: TypeCollector): KotlinCodeFile {
+	private fun generateOuterService(codeSource: KotlinCodeSource, descriptor: ServiceDescriptor, loggers: TypeCollector) {
 		val name = descriptor.name.self
 		
-		return KotlinCodeFile(sidePackage.resolveEntityName("${name}Outer")).apply {
+		codeSource.newFile(sidePackage.resolveEntityName("${name}Outer")).apply {
 			addDependency(descriptor.name)
 			addDependency("ru.capjack.csi.api/OuterService")
 			addDependency("ru.capjack.csi.api/Context")
@@ -410,8 +397,7 @@ abstract class KotlinApiGenerator(
 								addDependency("kotlin.coroutines/resume")
 								line("return suspendCoroutine { _continuation ->")
 								ident()
-							}
-							else this).apply {
+							} else this).apply {
 								
 								if (r != null) {
 									line("val _callback = _registerCallback { _callbackLocal -> ")
@@ -432,8 +418,7 @@ abstract class KotlinApiGenerator(
 												if (hasSubscription) {
 													line("val _subscription = " + coders.provideReadCall(this, PrimitiveType.INT))
 													line("_logInstanceOpen(\"${m.name}\", _callbackLocal, _service, _subscription) ")
-												}
-												else {
+												} else {
 													line("_logInstanceOpen(\"${m.name}\", _callbackLocal, _service) ")
 												}
 												
@@ -472,8 +457,7 @@ abstract class KotlinApiGenerator(
 								if (r == null) {
 									log = "_logMethodCall(\"${m.name}\") "
 									send = "_callMethod(${m.id})"
-								}
-								else {
+								} else {
 									log = "_logMethodCall(\"${m.name}\", _callback) "
 									send = "_callMethod(${m.id}, _callback)"
 								}
@@ -488,8 +472,7 @@ abstract class KotlinApiGenerator(
 								
 								if (arguments.isEmpty()) {
 									line(send)
-								}
-								else {
+								} else {
 									identBracketsCurly("$send ") {
 										arguments.forEach { a ->
 											line(coders.provideWriteCall(this, a.type, a.name))
@@ -506,10 +489,10 @@ abstract class KotlinApiGenerator(
 		}
 	}
 	
-	private fun generateInnerSubscription(service: ServiceDescriptor, method: Method, loggers: TypeAggregator): KotlinCodeFile {
+	private fun generateInnerSubscription(codeSource: KotlinCodeSource, service: ServiceDescriptor, method: Method, loggers: TypeAggregator) {
 		val name = "${service.name.self}_${method.name}_InnerSubscription"
 		val arguments = method.arguments.filterIsInstance<Method.Argument.Subscription>()
-		return KotlinCodeFile(sidePackage.resolveEntityName(name)).apply {
+		codeSource.newFile(sidePackage.resolveEntityName(name)).apply {
 			addDependency("ru.capjack.csi.api/Context")
 			addDependency("ru.capjack.csi.api/OuterService")
 			addDependency("ru.capjack.csi.api/InnerSubscription")
@@ -549,8 +532,7 @@ abstract class KotlinApiGenerator(
 								a.parameters.indices.joinTo(this) { "p$it" }
 								append(')')
 							}
-						}
-						else {
+						} else {
 							identBracketsCurly("when (argumentId) ") {
 								arguments.forEachIndexed { q, a ->
 									identBracketsCurly("$q -> ") {
@@ -581,10 +563,10 @@ abstract class KotlinApiGenerator(
 		}
 	}
 	
-	private fun generateOuterSubscription(service: ServiceDescriptor, method: Method, loggers: TypeAggregator): KotlinCodeFile {
+	private fun generateOuterSubscription(codeSource: KotlinCodeSource, service: ServiceDescriptor, method: Method, loggers: TypeAggregator) {
 		val name = "${service.name.self}_${method.name}_OuterSubscription"
 		val arguments = method.arguments.filterIsInstance<Method.Argument.Subscription>()
-		return KotlinCodeFile(sidePackage.resolveEntityName(name)).apply {
+		codeSource.newFile(sidePackage.resolveEntityName(name)).apply {
 			addDependency("ru.capjack.csi.api/Context")
 			addDependency("ru.capjack.csi.api/InnerServiceDelegate")
 			addDependency("ru.capjack.csi.api/OuterSubscription")
@@ -618,8 +600,7 @@ abstract class KotlinApiGenerator(
 							}
 							if (a.parameters.isEmpty()) {
 								line("call($id)")
-							}
-							else {
+							} else {
 								identBracketsCurly("call($id) ") {
 									a.parameters.forEachIndexed { i, p ->
 										line(coders.provideWriteCall(this, p.type, "p$i"))
@@ -655,8 +636,8 @@ abstract class KotlinApiGenerator(
 		}.toString()
 	}
 	
-	private fun generateLogging(loggers: TypeAggregator): KotlinCodeFile {
-		return KotlinCodeFile(sidePackage.resolveEntityName("_logging")).apply {
+	private fun generateLogging(codeSource: KotlinCodeSource, loggers: TypeAggregator) {
+		codeSource.newFile(sidePackage.resolveEntityName("_logging")).apply {
 			body.apply {
 				loggers.forEach { type ->
 					val name = defineLogName(type)
@@ -684,8 +665,7 @@ abstract class KotlinApiGenerator(
 			return if (data.sep) {
 				data.code.addDependency("ru.capjack.csi.api/logS")
 				"logS"
-			}
-			else {
+			} else {
 				data.code.addDependency("ru.capjack.csi.api/log")
 				"log"
 			}
@@ -698,8 +678,7 @@ abstract class KotlinApiGenerator(
 			
 			if (data.argName == null) {
 				data.code.line("$fn(${data.argVal}, $logger)")
-			}
-			else {
+			} else {
 				data.code.line("$fn(\"${data.argName}\", ${data.argVal}, $logger)")
 			}
 		}
@@ -708,8 +687,7 @@ abstract class KotlinApiGenerator(
 			val fn = defineFn(data)
 			if (data.argName == null) {
 				data.code.line("$fn(${data.argVal})")
-			}
-			else {
+			} else {
 				data.code.line("$fn(\"${data.argName}\", ${data.argVal})")
 			}
 		}
@@ -731,12 +709,10 @@ abstract class KotlinApiGenerator(
 				val fn = defineFn(data)
 				if (data.argName == null) {
 					data.code.line("$fn(${data.argVal}.name)")
-				}
-				else {
+				} else {
 					data.code.line("$fn(\"${data.argName}\", ${data.argVal}.name)")
 				}
-			}
-			else {
+			} else {
 				visitGenerated(type, data)
 			}
 		}
@@ -799,8 +775,7 @@ abstract class KotlinApiGenerator(
 			data.code.apply {
 				if (entity.children.isEmpty()) {
 					visitClassEntity0(entity, data)
-				}
-				else {
+				} else {
 					identBracketsCurly("when (it) ") {
 						entity.children.forEach {
 							val type = model.resolveEntityType(it.name)
@@ -809,8 +784,7 @@ abstract class KotlinApiGenerator(
 						}
 						if (entity.abstract) {
 							line("else -> throw UnsupportedOperationException()")
-						}
-						else {
+						} else {
 							identBracketsCurly("else -> ") {
 								visitClassEntity0(entity, data)
 							}

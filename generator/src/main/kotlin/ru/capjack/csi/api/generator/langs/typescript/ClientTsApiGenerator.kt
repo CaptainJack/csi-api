@@ -2,7 +2,7 @@ package ru.capjack.csi.api.generator.langs.typescript
 
 import ru.capjack.csi.api.generator.model.ApiModel
 import ru.capjack.tool.biser.generator.Code
-import ru.capjack.tool.biser.generator.langs.typescript.TsCodeFile
+import ru.capjack.tool.biser.generator.CodeSource
 import ru.capjack.tool.biser.generator.langs.typescript.TsCodersGenerator
 
 open class ClientTsApiGenerator(
@@ -11,8 +11,8 @@ open class ClientTsApiGenerator(
 	targetPackage: String
 ) : TsApiGenerator(model, coders, targetPackage, "client") {
 	
-	override fun generate(files: MutableList<TsCodeFile>) {
-		generate(model.client, model.server, files)
+	override fun generate(codeSource: CodeSource) {
+		generate(model.client, model.server, codeSource)
 	}
 	
 	override fun generateApiAdapterDeclaration(code: Code, iaName: String, oaName: String): Code {

@@ -2,7 +2,6 @@ package ru.capjack.csi.api.gradle
 
 import org.gradle.api.Project
 import java.io.File
-import java.nio.file.Path
 import java.nio.file.Paths
 
 open class CsiApiExtension(private val project: Project) {
@@ -20,8 +19,26 @@ open class CsiApiExtension(private val project: Project) {
 		}
 	}
 	
-	fun targetClientTypescript(name: String = "client", targetSourceDir: String? = null) {
-		target(ClientTypescriptApiTarget(name, targetSourceDir?.let { Paths.get(targetSourceDir) }))
+	fun targetClientTypescriptSeparated(
+		name: String = "client",
+		targetSourceDir: String,
+		genPrefix: String,
+		genPath: String,
+		libPath: String,
+		cutGenPrefix: String? = null,
+		cutLibPrefix: String? = null
+	) {
+		target(
+			ClientTypescriptSeparatedApiTarget(
+				name,
+				targetSourceDir.let { if (it.startsWith("..")) project.projectDir.resolve(it).absoluteFile.toPath() else Paths.get(it) },
+				genPrefix,
+				genPath,
+				libPath,
+				cutGenPrefix,
+				cutLibPrefix
+			)
+		)
 	}
 	
 	fun targetClientKotlin(name: String = "client", vararg platforms: KotlinPlatform = arrayOf(KotlinPlatform.JS)) {

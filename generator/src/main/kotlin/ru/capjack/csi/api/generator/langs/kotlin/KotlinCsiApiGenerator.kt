@@ -1,26 +1,28 @@
 package ru.capjack.csi.api.generator.langs.kotlin
 
-import ru.capjack.csi.api.generator.CsiApiGenerator
 import ru.capjack.csi.api.generator.model.ApiModel
+import ru.capjack.tool.biser.generator.langs.kotlin.KotlinCodeSource
 import ru.capjack.tool.biser.generator.langs.kotlin.KotlinCodersGenerator
 import java.nio.file.Path
 
-abstract class KotlinCsiApiGenerator(protected val sourcePackage: String) : CsiApiGenerator {
-	override fun generate(model: ApiModel, targetSourceDir: Path) {
+abstract class KotlinCsiApiGenerator(protected val sourcePackage: String) {
+	fun generate(model: ApiModel, targetSourceDir: Path) {
 		val codersGenerator = createCodersGenerator(model)
 		val apiGenerator = createApiGenerator(model, codersGenerator)
 		
 		val target = targetSourceDir.resolve(apiGenerator.targetPackage.full.joinToString("/")).toFile()
-		val files = mutableSetOf<Path>()
 		
-		files.addAll(apiGenerator.generate(targetSourceDir))
-		files.addAll(codersGenerator.generate(targetSourceDir))
+		val codeSource = KotlinCodeSource(targetSourceDir)
+		
+		apiGenerator.generate(codeSource)
+		codersGenerator.generate(codeSource)
+		
+		val files = codeSource.saveNewFiles()
 		
 		target.walkBottomUp().forEach {
 			if (it.isDirectory) {
 				if (it.listFiles()?.size == 0) it.delete()
-			}
-			else if (!files.contains(it.toPath())) {
+			} else if (!files.contains(it.toPath())) {
 				it.delete()
 			}
 		}

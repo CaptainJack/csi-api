@@ -76,8 +76,24 @@ class ClientKotlinApiTarget(name: String, platforms: Set<KotlinPlatform>) : Kotl
 	}
 }
 
-class ClientTypescriptApiTarget(name: String, private val targetSourceDir: Path? = null) : ApiTarget(name) {
+class ClientTypescriptSeparatedApiTarget(
+	name: String,
+	private val targetSourceDir: Path? = null,
+	private val genPrefix: String,
+	private val genPath: String,
+	private val libPath: String,
+	private val cutGenPrefix: String? = null,
+	private val cutLibPrefix: String? = null
+) : ApiTarget(name) {
 	override fun generate(delegate: KotlinApiModelDelegate) {
-		ClientTsCsiApiGenerator(delegate.sourcePackage).generate(delegate.model, targetSourceDir ?: project.projectDir.toPath())
+		ClientTsCsiApiGenerator(delegate.sourcePackage).generateSeparated(
+			delegate.model,
+			targetSourceDir ?: project.projectDir.toPath(),
+			genPrefix,
+			genPath,
+			libPath,
+			cutGenPrefix,
+			cutLibPrefix
+		)
 	}
 }
