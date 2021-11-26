@@ -18,7 +18,6 @@ class ClientTsCsiApiGenerator(private val sourcePackage: String) {
 		val codersGenerator = TsCodersGenerator(model, "$sourcePackage._impl")
 		val apiGenerator = ClientTsApiGenerator(model, codersGenerator, sourcePackage)
 		
-		val target = targetSourceDir.resolve(apiGenerator.targetPackage.full.joinToString("/")).toFile()
 		val codeSource = SeparatedTsCodeSource(targetSourceDir, genPrefix, genPath, libPath, cutGenPrefix, cutLibPrefix)
 		
 		apiGenerator.generate(codeSource)
@@ -26,7 +25,7 @@ class ClientTsCsiApiGenerator(private val sourcePackage: String) {
 		
 		val files = codeSource.saveNewFiles()
 		
-		target.walkBottomUp().forEach {
+		codeSource.genPath.toFile().walkBottomUp().forEach {
 			if (it.isDirectory) {
 				if (it.listFiles()?.size == 0) it.delete()
 			} else if (!files.contains(it.toPath())) {
