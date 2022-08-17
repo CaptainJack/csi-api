@@ -1,4 +1,4 @@
-package ru.capjack.tool.biser.generator
+package ru.capjack.csi.api.generator
 
 import ru.capjack.tool.biser.generator.model.Type
 

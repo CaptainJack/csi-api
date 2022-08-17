@@ -12,7 +12,7 @@ import ru.capjack.csi.api.generator.model.ServiceDescriptor
 import ru.capjack.tool.biser.generator.Code
 import ru.capjack.tool.biser.generator.CodeSource
 import ru.capjack.tool.biser.generator.DependedCode
-import ru.capjack.tool.biser.generator.TypeCollector
+import ru.capjack.csi.api.generator.TypeCollector
 import ru.capjack.tool.biser.generator.langs.typescript.TsCodersGenerator
 import ru.capjack.tool.biser.generator.model.*
 
@@ -109,6 +109,7 @@ abstract class TsApiGenerator(
 								addDependency("ru.capjack.tool.utils/Cancelable")
 								append(": Promise<Cancelable>")
 							}
+							null -> {}
 						}
 					}
 					line()

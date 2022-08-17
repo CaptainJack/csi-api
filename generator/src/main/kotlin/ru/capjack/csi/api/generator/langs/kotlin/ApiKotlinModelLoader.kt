@@ -41,6 +41,7 @@ class ApiKotlinModelLoader(
 					loadApi(api, descriptor)
 				}
 			}
+			
 			else                -> super.processClassDescriptor(descriptor)
 		}
 		
@@ -92,14 +93,15 @@ class ApiKotlinModelLoader(
 		val result = source.returnType?.takeUnless(KotlinType::isUnit)?.let {
 			val string = it.toString()
 			when {
-				string == "[ERROR : Cancelable]" -> Method.Result.Subscription
-				string.startsWith("[ERROR : ServiceInstance<") -> {
+				string == "[Error type: Unresolved type for Cancelable]" -> Method.Result.Subscription
+				string.startsWith("[Error type: Unresolved type for ServiceInstance<") -> {
 					val serviceDescriptorSource = it.arguments.first().type.constructor.declarationDescriptor as ClassDescriptor
 					val serviceDescriptorName = resolveName(serviceDescriptorSource)
 					val serviceDescriptor = model.resolveServicesDescriptor(serviceDescriptorName)
 					loadServiceDescriptor(serviceDescriptor, serviceDescriptorSource)
 					Method.Result.InstanceService(serviceDescriptor)
 				}
+				
 				else -> {
 					Method.Result.Value(resolveType(it))
 				}
@@ -115,7 +117,13 @@ class ApiKotlinModelLoader(
 		
 		val arguments = source.valueParameters.map { a ->
 			if (a.type.isFunctionType) {
-				require(result == Method.Result.Subscription || result is Method.Result.InstanceService) { "Subscription method require Cancelable or Closable result (${target.name.full.joinToString(".")}:$name)" }
+				require(result == Method.Result.Subscription || result is Method.Result.InstanceService) {
+					"Subscription method require Cancelable or Closable result (${
+						target.name.full.joinToString(
+							"."
+						)
+					}:$name)"
+				}
 				Method.Argument.Subscription(
 					a.name.toString(),
 					a.type.getValueParameterTypesFromFunctionType().map {

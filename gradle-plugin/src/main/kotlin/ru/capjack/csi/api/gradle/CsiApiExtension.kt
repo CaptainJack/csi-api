@@ -41,11 +41,11 @@ open class CsiApiExtension(private val project: Project) {
 		)
 	}
 	
-	fun targetClientKotlin(name: String = "client", vararg platforms: KotlinPlatform = arrayOf(KotlinPlatform.JS)) {
-		target(ClientKotlinApiTarget(name, platforms.toSet()))
+	fun targetClientKotlin(name: String = "client", vararg platforms: KotlinPlatform = arrayOf(KotlinPlatform.JS), jvm: String = "17") {
+		target(ClientKotlinApiTarget(name, platforms.toSet(), jvm))
 	}
 	
-	fun targetServerKotlin(name: String = "server") {
-		target(ServerKotlinApiTarget(name))
+	fun targetServerKotlin(name: String = "server", jvm: String = "17") {
+		target(ServerKotlinApiTarget(name, jvm))
 	}
 }

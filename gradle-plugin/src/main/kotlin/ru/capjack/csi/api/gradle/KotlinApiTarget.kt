@@ -11,7 +11,8 @@ abstract class KotlinApiTarget(
 	name: String,
 	private val side: ApiSide,
 	private val platforms: Set<KotlinPlatform>,
-	private val dependsOnParent: Boolean = true
+	private val dependsOnParent: Boolean = true,
+	private val jvmVersion: String = "17"
 ) : ApiTarget(name) {
 	override fun configureProject(sourceProject: Project) {
 		super.configureProject(sourceProject)
@@ -23,6 +24,7 @@ abstract class KotlinApiTarget(
 					sourceProject.configureJvm()
 					project.configureJvm()
 				}
+				
 				KotlinPlatform.JS  -> {
 					sourceProject.configureJs()
 					project.configureJs()
@@ -36,7 +38,7 @@ abstract class KotlinApiTarget(
 	private fun Project.configureJvm() {
 		kmp {
 			jvm {
-				compilations.all { kotlinOptions.jvmTarget = "11" }
+				compilations.all { kotlinOptions.jvmTarget = jvmVersion }
 			}
 		}
 	}
@@ -64,13 +66,13 @@ abstract class KotlinApiTarget(
 }
 
 
-class ServerKotlinApiTarget(name: String) : KotlinApiTarget(name, ApiSide.SERVER, setOf(KotlinPlatform.JVM)) {
+class ServerKotlinApiTarget(name: String, jvm: String) : KotlinApiTarget(name, ApiSide.SERVER, setOf(KotlinPlatform.JVM), jvmVersion = jvm) {
 	override fun generate(delegate: KotlinApiModelDelegate) {
 		ServerKotlinCsiApiGenerator(delegate.sourcePackage).generate(delegate.model, project.kmpSourceDirCommonMain.toPath())
 	}
 }
 
-class ClientKotlinApiTarget(name: String, platforms: Set<KotlinPlatform>) : KotlinApiTarget(name, ApiSide.CLIENT, platforms) {
+class ClientKotlinApiTarget(name: String, platforms: Set<KotlinPlatform>, jvm: String) : KotlinApiTarget(name, ApiSide.CLIENT, platforms, jvmVersion = jvm) {
 	override fun generate(delegate: KotlinApiModelDelegate) {
 		ClientKotlinCsiApiGenerator(delegate.sourcePackage).generate(delegate.model, project.kmpSourceDirCommonMain.toPath())
 	}

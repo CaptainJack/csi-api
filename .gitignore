@@ -1,6 +1,7 @@
 /.gradle
 /.idea
 /tmp
+/kotlin-js-store
 
 build
 .DS_Store

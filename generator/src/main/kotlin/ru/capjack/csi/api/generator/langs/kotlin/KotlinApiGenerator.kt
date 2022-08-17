@@ -11,7 +11,7 @@ import ru.capjack.csi.api.generator.model.Service
 import ru.capjack.csi.api.generator.model.ServiceDescriptor
 import ru.capjack.tool.biser.generator.Code
 import ru.capjack.tool.biser.generator.DependedCode
-import ru.capjack.tool.biser.generator.TypeCollector
+import ru.capjack.csi.api.generator.TypeCollector
 import ru.capjack.tool.biser.generator.langs.kotlin.KotlinCodeSource
 import ru.capjack.tool.biser.generator.langs.kotlin.KotlinCodersGenerator
 import ru.capjack.tool.biser.generator.model.*
@@ -310,6 +310,7 @@ abstract class KotlinApiGenerator(
 											
 											line("logInstanceServiceResponse(\"${m.name}\", c, s, ssi) ")
 											line("sendInstanceServiceResponse(c, s, ssi) ")
+											line("ss.ready()")
 										} else {
 											line("logInstanceServiceResponse(\"${m.name}\", c, s) ")
 											line("sendInstanceServiceResponse(c, s) ")
@@ -331,6 +332,7 @@ abstract class KotlinApiGenerator(
 										line("val i = registerSubscription(s, e)")
 										line("logSubscriptionResponse(\"${m.name}\", c, i) ")
 										line("sendSubscriptionResponse(c, i) ")
+										line("s.ready()")
 									}
 								}
 							}
@@ -593,17 +595,37 @@ abstract class KotlinApiGenerator(
 							}
 						}
 						ident {
-							identBracketsCurly("logCall(\"${a.name}\") ") {
-								a.parameters.forEachIndexed { i, p ->
-									logCall(loggers, a.parameters.lastIndex == i, p.type, p.name, "p$i")
+							identBracketsCurly("if (_ready) ") {
+								identBracketsCurly("logCall(\"${a.name}\") ") {
+									a.parameters.forEachIndexed { i, p ->
+										logCall(loggers, a.parameters.lastIndex == i, p.type, p.name, "p$i")
+									}
+								}
+								if (a.parameters.isEmpty()) {
+									line("call($id)")
+								}
+								else {
+									identBracketsCurly("call($id) ") {
+										a.parameters.forEachIndexed { i, p ->
+											line(coders.provideWriteCall(this, p.type, "p$i"))
+										}
+									}
 								}
 							}
-							if (a.parameters.isEmpty()) {
-								line("call($id)")
-							} else {
-								identBracketsCurly("call($id) ") {
+							identBracketsCurly("else delayCall ") {
+								identBracketsCurly("logCall(\"${a.name}\") ") {
 									a.parameters.forEachIndexed { i, p ->
-										line(coders.provideWriteCall(this, p.type, "p$i"))
+										logCall(loggers, a.parameters.lastIndex == i, p.type, p.name, "p$i")
+									}
+								}
+								if (a.parameters.isEmpty()) {
+									line("call($id)")
+								}
+								else {
+									identBracketsCurly("call($id) ") {
+										a.parameters.forEachIndexed { i, p ->
+											line(coders.provideWriteCall(this, p.type, "p$i"))
+										}
 									}
 								}
 							}

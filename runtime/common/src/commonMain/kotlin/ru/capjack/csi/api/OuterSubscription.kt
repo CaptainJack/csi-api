@@ -17,6 +17,19 @@ abstract class OuterSubscription(
 	@Volatile
 	private var _cancelable: Cancelable = Cancelable.DUMMY
 	
+	@Volatile
+	var _ready: Boolean = false
+	
+	@Volatile
+	private var _readyDelegate: OuterSubscriptionReadyDelegate? = OuterSubscriptionReadyDelegate(this)
+	
+	fun ready() {
+		check(!_ready)
+		_ready = true
+		_readyDelegate!!.ready()
+		_readyDelegate = null
+	}
+	
 	internal fun setup(id: Int, cancelable: Cancelable) {
 		_id = id
 		_cancelable = cancelable
@@ -29,6 +42,11 @@ abstract class OuterSubscription(
 		
 		_cancelable.cancel()
 		_cancelable = Cancelable.DUMMY
+	}
+	
+	protected fun delayCall(fn: () -> Unit) {
+		val delegate = _readyDelegate
+		if (delegate == null) fn() else delegate.delay(fn)
 	}
 	
 	protected fun call(methodId: Int) {
